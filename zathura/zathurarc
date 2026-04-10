@@ -5,7 +5,7 @@ set scroll-full-overlap 0.01
 set scroll-step 0.01
 set guioptions ""
 set selection-clipboard clipboard
-set render-loading "true"
+set render-loading "false"
 set scroll-step 50
 
 # maps
@@ -51,8 +51,14 @@ set notification-bg "#90A959" #0B
 set notification-fg "#151515" #00
 
 set recolor true
-set recolor-keephue true
+set recolor-keephue false
 
 set recolor-lightcolor "#000000"
 set recolor-darkcolor  "#E0E0E0"
+
+# Keybinds
+
+# <Esc> to close notifications
+# <Tab> to search mode
+# <number>G to goto a page
 

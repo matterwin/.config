@@ -38,6 +38,8 @@ Plug 'rking/ag.vim'
 Plug 'farmergreg/vim-lastplace'
 Plug 'google/vim-searchindex'
 
+Plug 'ap/vim-css-color'
+
 Plug 'michaeljsmith/vim-indent-object'
 
 " Aesthetics
@@ -54,6 +56,7 @@ Plug 'ryanoasis/vim-devicons'
 
 " Academic
 Plug 'lervag/vimtex'
+Plug 'preservim/vim-markdown'
 
 " Lsp plugins
 Plug 'prabirshrestha/vim-lsp'
@@ -64,12 +67,22 @@ Plug 'dense-analysis/ale'
 call plug#end()
 " ---------------------------------
 
+" :let g:use_markdown = 1
+" :let g:use_markdown = 0
+
+"Unbind section
+
 " disable predefined C-w, includes: splits, etc
-nnoremap <C-w> <Nop>
-vnoremap <C-w> <Nop>
-xnoremap <C-w> <Nop>
-onoremap <C-w> <Nop>
-tnoremap <C-w> <Nop>
+" nnoremap <C-w> <Nop>
+" vnoremap <C-w> <Nop>
+" xnoremap <C-w> <Nop>
+" onoremap <C-w> <Nop>
+" tnoremap <C-w> <Nop>
+
+map <C-w> <Nop>
+map Q <Nop>
+
+nnoremap <C-1> :echo "hello"<CR>
 
 "" Vim Lsp:
 filetype plugin on
@@ -402,6 +415,9 @@ tnoremap <Esc> <C-\><C-n>
 " tnoremap <C-M-k> <C-\><C-n>:TmuxNavigateUp<CR>
 " tnoremap <C-M-l> <C-\><C-n>:TmuxNavigateRight<CR>
 
+nnoremap n nzzzv
+nnoremap N Nzzzv
+
 " vim-sneak
 let g:sneak#s_next = 1
 
@@ -450,7 +466,7 @@ nnoremap <C-g> :call AgCursorWord()<CR>
 
 " nerdtree
 let NERDTreeShowHidden=1
-map <C-n> :NERDTreeToggle<CR>
+" map <C-n> :NERDTreeToggle<CR>
 
 " static width
 " let g:NERDTreeWinSize = 40
@@ -510,9 +526,15 @@ set nopaste
 " highlight Visual guifg=#FFFFFF guibg=#111111
 
 " Tabs
-nnoremap <C-;> :tabprevious<CR>
-nnoremap <C-'> :tabnext<CR>
 nnoremap <Tab> <Nop>
+
+" acts as C-; and C-'
+" when in tmux
+nnoremap <C-^> :tabnext<CR>
+nnoremap <C-_> :tabprevious<CR>
+" when not in tmux
+nnoremap <Char-0x1e> :tabprevious<CR>
+nnoremap <Char-0x1f> :tabnext<CR>
 
 " Buffers (jump list style)
 " jump forward
@@ -530,12 +552,17 @@ inoremap ,- _{}<Left>
 inoremap ,fr \frac{}{}<Left><Left><Left>
 inoremap ,su \sum_{}^{}<Left><Left><Left>
 inoremap ,in \int_{}^{}<Left><Left><Left><Left>
-inoremap ,bi \binom{}{}<Left><Left><Left>
+inoremap ,bn \binom{}{}<Left><Left><Left>
 inoremap ,ts \times
 inoremap ,ck \check{}<Left>
 inoremap ,wh \widehat
+inoremap ,ma \max_{}<Left>
+inoremap ,mi \min_{}<Left>
 "do a keybind for \tilde
 
+inoremap ,ri \right
+inoremap ,le \left
+inoremap ,\| \left\|  \right\|<Left><Left><Left><Left><Left><Left>
 inoremap ,( \left(  \right)<Left><Left><Left><Left><Left><Left>
 inoremap ,9 \left(  \right)<Left><Left><Left><Left><Left><Left><Left><Left>
 inoremap ,[ \left[  \right<Left><Left><Left><Left><Left><Left><Left><Left>
@@ -547,7 +574,12 @@ inoremap ,b9 \Big(  \Big)<Left><Left><Left>
 inoremap ,b[ \Big[  \Big]<Left><Left><Left>
 inoremap ,b{ \Big\{  \Big\}<Left><Left><Left>
 inoremap ,ss \subsection*{}<Left>
+inoremap ,pg \paragraph{}<Left>
+inoremap ,it \textit{}<Left>
 
+inoremap ,bi \begin{itemize}<CR><CR>\end{itemize}<Esc>kA
+inoremap ,bq \begin{quote}<CR><CR>\end{quote}<Esc>kA
+inoremap ,bc \begin{center}<CR><CR>\end{center}<Esc>kA
 inoremap ,bv \begin{verbatim}<CR><CR>\end{verbatim}<Esc>kA
 inoremap ,eq \begin{equation*}<CR><CR>\end{equation*}<Esc>kA
 inoremap ,ar \begin{array}<CR><CR>\end{array}<Esc>kA
@@ -561,6 +593,7 @@ inoremap ,ub \underbrace{}_{}<Left><Left><Left><Left>
 inoremap ,ob \overbrace{}^{}<Left><Left><Left><Left>
 inoremap ,pa \partial
 inoremap ,vp \vspace{}<Left>
+inoremap ,vb \verb\|\|<Left>
 
 " ----- Lowercase -----
 inoremap ,a  \alpha
@@ -674,11 +707,7 @@ set noswapfile
 
 " marks 
 nnoremap <leader>m :marks<CR>
-" jump to line mark
-nnoremap '' `
-" jump to line + col mark
-nnoremap ' '
-
+nnoremap ' `
 nnoremap m :call SetMark()<CR>
 
 function! SetMark()
@@ -801,12 +830,56 @@ command! -nargs=+ Grep execute 'silent! grep! <q-args>' | execute 'copen'
 
 nnoremap <leader>uv :e $MYVIMRC<CR>
 nnoremap <leader>uV :source $MYVIMRC<CR>
-nnoremap <leader>e :new<CR>:Ex<CR>
+nnoremap <C-n> :call ToggleEx()<CR>
+
+function! ToggleEx()
+  if &filetype ==# 'netrw'
+    buffer #
+  else
+    Ex
+  endif
+endfunction
+
+" turn to 0 to make it cwd
+let g:netrw_keepdir = 1
+let g:netrw_banner = 0
+
+" netrw_liststyle options:
+" 0 = Thin  - simple one-file-per-line list (default)
+" 1 = Long  - filename + file size + date
+" 2 = Wide  - multiple files per line, column layout
+" 3 = Tree  - NERDTree-style expandable tree
+let g:netrw_liststyle = 3
+
+" netrw_browse_split options (where files open on Enter):
+" 0 = same window (replaces netrw)
+" 1 = horizontal split
+" 2 = vertical split
+" 3 = new tab
+" 4 = previous window (most like NERDTree side panel)
+let g:netrw_browse_split = 0
+
 autocmd FileType netrw nnoremap <buffer> <C-h> <C-w>h
 autocmd FileType netrw nnoremap <buffer> <C-j> <C-w>j
 autocmd FileType netrw nnoremap <buffer> <C-k> <C-w>k
 autocmd FileType netrw nnoremap <buffer> <C-l> <C-w>l
 autocmd FileType netrw setlocal number relativenumber
+
+function! NetrwCollapseAll()
+  if exists('g:netrw_treedict')
+    unlet g:netrw_treedict
+  endif
+  let cwd = getcwd()
+  bunload
+  execute 'Explore' cwd
+endfunction
+
+augroup netrw_maps
+    autocmd!
+    autocmd FileType netrw nmap <buffer> cd gn
+    autocmd FileType netrw nmap <buffer> cc <CR>
+    autocmd FileType netrw nmap <buffer> cC  :call NetrwCollapseAll()<CR>
+augroup END
 
 nnoremap c; q:
 
@@ -878,6 +951,17 @@ nnoremap <leader>7 7gt
 nnoremap <leader>8 8gt
 nnoremap <leader>9 9gt
 nnoremap <leader>0 :tablast<CR>
+
+nnoremap <Tab>1 1gt
+nnoremap <Tab>2 2gt
+nnoremap <Tab>3 3gt
+nnoremap <Tab>4 4gt
+nnoremap <Tab>5 5gt
+nnoremap <Tab>6 6gt
+nnoremap <Tab>7 7gt
+nnoremap <Tab>8 8gt
+nnoremap <Tab>9 9gt
+nnoremap <Tab>0 :tablast<CR>
 
 " ---------------------------
 " find and replace
