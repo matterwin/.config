@@ -537,9 +537,11 @@ nnoremap <Char-0x1e> :tabprevious<CR>
 nnoremap <Char-0x1f> :tabnext<CR>
 
 " Buffers (jump list style)
-" jump forward
-nnoremap <C-I> <C-I>
-" jump back
+" Disable tab in normal mode (vim thinks C-I is tab)
+nnoremap <C-I> <Nop>
+" jump forward 
+nnoremap <C-I> <C-I> 
+" jump back 
 nnoremap <C-O> <C-O>
 
 " add in C-9 in insert mode to go to back of sentence
@@ -576,6 +578,7 @@ inoremap ,b{ \Big\{  \Big\}<Left><Left><Left>
 inoremap ,ss \subsection*{}<Left>
 inoremap ,pg \paragraph{}<Left>
 inoremap ,it \textit{}<Left>
+inoremap ,pb \pbreak
 
 inoremap ,bi \begin{itemize}<CR><CR>\end{itemize}<Esc>kA
 inoremap ,bq \begin{quote}<CR><CR>\end{quote}<Esc>kA
@@ -784,8 +787,7 @@ nnoremap <M-S-J> :resize -2<CR>
 " Tabs "
 filetype on
 filetype plugin indent on
-filetype indent on
-set expandtab
+" set expandtab
 set shiftwidth=4
 set tabstop=4
 set softtabstop=4
@@ -1008,6 +1010,13 @@ vnoremap q <Nop>
 " snoremap <A-q> <Esc>
 " onoremap <A-q> <Esc>
 
+" I hit this a lot; begone background (fg fix)
+nnoremap <C-Z> <Nop>
+inoremap <C-Z> <Nop>
+vnoremap <C-Z> <Nop>
+cnoremap <C-Z> <Nop>
+tnoremap <C-Z> <Nop>
+
 nnoremap <Leader>\ :noh<CR>
 " nnoremap <Esc><Esc> :confirm bd<CR>
 " nnoremap <Esc><Esc> :confirm tabclose<CR>
@@ -1163,3 +1172,11 @@ nnoremap <leader>q :confirm close<CR>
 "   endif
 " endfunction
 
+" Ctrl+a increments number under cursor
+" Ctrl+x decrements number under cursor
+"
+" yy yanks whole line
+" yl yanks 1 char 
+" y$ yanks to end of line 
+" yw yanks work
+" yW yanks work from space to space
