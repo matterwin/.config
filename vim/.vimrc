@@ -577,8 +577,10 @@ inoremap ,b[ \Big[  \Big]<Left><Left><Left>
 inoremap ,b{ \Big\{  \Big\}<Left><Left><Left>
 inoremap ,ss \subsection*{}<Left>
 inoremap ,pg \paragraph{}<Left>
-inoremap ,it \textit{}<Left>
+inoremap ,txit \textit{}<Left>
+inoremap ,it \item
 inoremap ,pb \pbreak
+inoremap ,np \newpage
 
 inoremap ,bi \begin{itemize}<CR><CR>\end{itemize}<Esc>kA
 inoremap ,bq \begin{quote}<CR><CR>\end{quote}<Esc>kA
@@ -1180,3 +1182,31 @@ nnoremap <leader>q :confirm close<CR>
 " y$ yanks to end of line 
 " yw yanks work
 " yW yanks work from space to space
+
+
+" Offsets for /pattern searches in Vim
+" /pattern/s      -> move to start of match
+" /pattern/e      -> move to end of match
+
+" /pattern/s+1    -> 1 char after start of match
+" /pattern/s-1    -> 1 char before start of match
+
+" /pattern/e+1    -> 1 char after end of match
+" /pattern/e-1    -> 1 char before end of match
+
+" /pattern/s+N    -> N chars after start of match
+" /pattern/s-N    -> N chars before start of match
+
+" /pattern/e+N    -> N chars after end of match
+" /pattern/e-N    -> N chars before end of match
+
+" /pattern/b+1    -> same as /s+1 (b = beginning of match)
+" /pattern/b-1    -> same as /s-1
+
+" /pattern        -> default: cursor at start of match
+" ?pattern/e      -> search backward, land at end of match
+
+" Notes:
+" - offsets apply when pressing n / N as well
+" - prefer /e instead of manual length offsets like /s+7
+" - useful for precise cursor placement in repetitive navigation
