@@ -9,7 +9,6 @@ let mapleader = " "
 " sudo apt update
 " sudo apt install vim-gtk3
 
-
 " Plugins --------------------------------------- "
 "
 " Must have plugins
@@ -31,6 +30,7 @@ call plug#begin('~/.vim/plugged')
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
+" switched to netrw
 " Plug 'preservim/nerdtree'
 Plug 'justinmk/vim-sneak'
 Plug 'tpope/vim-commentary'
@@ -38,21 +38,20 @@ Plug 'rking/ag.vim'
 Plug 'farmergreg/vim-lastplace'
 Plug 'google/vim-searchindex'
 
-Plug 'ap/vim-css-color'
-
-Plug 'michaeljsmith/vim-indent-object'
-
 " Aesthetics
+Plug 'ap/vim-css-color'
+Plug 'kshenoy/vim-signature'
 Plug 'catppuccin/nvim', { 'as': 'catppuccin' }
 Plug 'itchyny/lightline.vim'
-" Plug 'altercation/vim-colors-solarized'
 Plug 'morhetz/gruvbox'
 Plug 'itchyny/vim-gitbranch'
 Plug 'NLKNguyen/papercolor-theme'
 Plug 'crusoexia/vim-monokai'
 Plug 'Yggdroot/indentLine'
 Plug 'nathanaelkane/vim-indent-guides'
-Plug 'ryanoasis/vim-devicons'
+" Plug 'ryanoasis/vim-devicons'
+Plug 'pkradiator/netrw-file-icons'
+Plug 'michaeljsmith/vim-indent-object'
 
 " Academic
 Plug 'lervag/vimtex'
@@ -84,6 +83,8 @@ map Q <Nop>
 
 nnoremap <C-1> :echo "hello"<CR>
 
+let g:asyncomplete_auto_popup = 1
+
 "" Vim Lsp:
 filetype plugin on
 " copied (almost) directly from the vim-lsp docs:
@@ -113,8 +114,11 @@ endif
 if executable('clangd')
     au User lsp_setup call lsp#register_server({
         \ 'name': 'clangd',
-        \ 'cmd': ['clangd', '--header-insertion=never'],
-        \ 'whitelist': ['c', 'cpp'],
+        \ 'cmd': ['clangd',
+        \         '--header-insertion=never',
+        \         '--compile-commands-dir=.',
+        \ ],
+        \ 'allowlist': ['c', 'cpp'],
     \ })
 endif
 
@@ -123,6 +127,14 @@ if executable('pylsp')
     au User lsp_setup call lsp#register_server({
         \ 'name': 'pylsp',
         \ 'cmd': {server_info->['pylsp']},
+        \ 'allowlist': ['python'],
+        \ })
+endif
+
+if executable('pyright-langserver')
+    au User lsp_setup call lsp#register_server({
+        \ 'name': 'pyright',
+        \ 'cmd': {server_info->['pyright-langserver', '--stdio']},
         \ 'allowlist': ['python'],
         \ })
 endif
@@ -162,7 +174,7 @@ endif
 nnoremap gd :LspDefinition<CR>
 nnoremap gD :LspDeclaration<CR>
 nnoremap gi <plug>(lsp-implementation)
-nnoremap K :LspHover<CR>
+nnoremap K :LspHover <CR>
 nnoremap gr :LspReferences<CR>
 " nnoremap <leader>rn :LspRename<CR>
 " nnoremap <leader>e :LspDiagnostic<CR>
@@ -174,6 +186,9 @@ let g:lsp_diagnostics_enabled = 0
 let g:lsp_signs_enabled = 0
 set signcolumn=no
 set foldcolumn=0
+
+" let g:lsp_hover_conceal = 0
+
 
 " function! ToggleLspDiagnostics()
 "   if g:lsp_signs_enabled
@@ -256,18 +271,40 @@ set incsearch
 " Statusline config (bottom bar and tabs)
 " ------------------------------
 
+let g:visual_char_count = ''
+
 let g:lightline = {
-    \ 'colorscheme': 'mytheme',
-    \ 'active': {
-    \   'left': [['filename', 'gitbranch', 'readonly'] ],
-    \   'right': [ ['lineinfo'], ['percent'], ['filetype'], ['searchindex'] ]
-    \ },
-    \ 'component_function': {
-    \   'gitbranch': 'gitbranch#name',
-    \   'filename': 'LightlineFilename',
-    \   'searchindex': 'LightlineSearchIndex'
-    \ },
-    \ }
+	\ 'colorscheme': 'mytheme',
+	\ 'active': {
+	\   'left': [['filename', 'gitbranch', 'readonly']],
+	\   'right': [ ['lineinfo'], ['percent'], ['filetype'], ['searchindex'], ['visualcount'] ]
+	\ },
+	\ 'component_function': {
+	\   'gitbranch': 'gitbranch#name',
+	\   'filename': 'LightlineFilename',
+	\   'searchindex': 'LightlineSearchIndex',
+	\   'visualcount': 'LightlineVisualCount'
+	\ },
+	\ }
+
+function! UpdateVisualCount()
+  if mode() =~# '[vV\<C-v>]'
+
+    " force visual marks update
+    normal! gv
+
+    let l:start = line("'<")
+    let l:end   = line("'>")
+
+    let l:lines = getline(l:start, l:end)
+    let l:text = join(l:lines, "\n")
+
+    let g:visual_char_count = strlen(l:text)
+
+  else
+    let g:visual_char_count = ''
+  endif
+endfunction
 
 function! LightlineSearchIndex() abort
   if !v:hlsearch
@@ -420,12 +457,20 @@ nnoremap N Nzzzv
 
 " vim-sneak
 let g:sneak#s_next = 1
+let g:sneak#label = 1
+
+" figure out how to be able to goto next word in visual mode or replace mode
 
 xmap s <Plug>Sneak_s
 xmap S <Plug>Sneak_S
 map f <Plug>Sneak_f
 map F <Plug>Sneak_F
+
+" map F <Plug>Sneak_F
+
 " S x y -> jump backward to xy
+
+nmap <leader>f ;
 
 " f/t  → tiny movement (single char)
 " s    → medium teleport (2 chars)
@@ -520,8 +565,6 @@ endfunction
 set relativenumber
 set number
 
-syntax on
-
 set nopaste
 " highlight Visual guifg=#FFFFFF guibg=#111111
 
@@ -577,7 +620,8 @@ inoremap ,b[ \Big[  \Big]<Left><Left><Left>
 inoremap ,b{ \Big\{  \Big\}<Left><Left><Left>
 inoremap ,ss \subsection*{}<Left>
 inoremap ,pg \paragraph{}<Left>
-inoremap ,txit \textit{}<Left>
+inoremap ,tt \text{}<Left>
+inoremap ,ti \textit{}<Left>
 inoremap ,it \item
 inoremap ,pb \pbreak
 inoremap ,np \newpage
@@ -599,16 +643,48 @@ inoremap ,ob \overbrace{}^{}<Left><Left><Left><Left>
 inoremap ,pa \partial
 inoremap ,vp \vspace{}<Left>
 inoremap ,vb \verb\|\|<Left>
+inoremap ,vo \vocab{
+					
+" inoremap <C-w> <C-o>:call GoInside()<CR>
+
+" function! GoInside()
+"     let targets = ['{', '(', '[']
+
+"     let c = nr2char(getchar())
+
+"     if c < '1' || c > '3'
+"         return
+"     endif
+
+"     let idx = str2nr(c) - 1
+"     let t = targets[idx]
+
+"     execute "normal! f" . t . "a"
+" endfunction
+
+" noremap  <C-w>1 <Cmd>call GoInside(1)<CR><Right>
+" noremap  <C-w>2 <Cmd>call GoInside(2)<CR><Right>
+" noremap  <C-w>3 <Cmd>call GoInside(3)<CR><Right>
+
+" inoremap <C-w>1 <C-o>:call GoInside(1)<CR><Right>
+" inoremap <C-w>2 <C-o>:call GoInside(2)<CR><Right>
+" inoremap <C-w>3 <C-o>:call GoInside(3)<CR><Right>
+
+" function! GoInside(idx)
+"     let targets = ['{', '(', '[']
+"     let c = targets[a:idx - 1]
+"     execute "normal! f" . c . "a"
+" endfunction
 
 " ----- Lowercase -----
 inoremap ,a  \alpha
 inoremap ,b  \beta
 inoremap ,g  \gamma
 inoremap ,d  \delta
-inoremap ,e  \epsilon
+inoremap ,ep \epsilon
 inoremap ,ve \varepsilon
 inoremap ,z  \zeta
-inoremap ,t  \theta
+inoremap ,th  \theta
 inoremap ,i  \iota
 inoremap ,k  \kappa
 inoremap ,l  \lambda
@@ -647,6 +723,7 @@ inoremap ,O \Omega
 
 inoremap ,nb \nabla
 
+inoremap ,bs \boldsymbol{}<Left>
 inoremap ,bf \mathbf{}<Left>
 inoremap ,bb \mathbb{}<Left>
 inoremap ,ca \mathcal{}<Left>
@@ -712,19 +789,19 @@ set noswapfile
 
 " marks 
 nnoremap <leader>m :marks<CR>
+nnoremap <leader>M :SignatureToggle<CR>
 nnoremap ' `
-nnoremap m :call SetMark()<CR>
+nnoremap m `
+nnoremap M :call SetMark()<CR>
 
 function! SetMark()
   let c = nr2char(getchar())
+
+  " set mark
   execute 'normal! m' . c
 
-  " Get position of the mark
-  let pos = getpos("'" . c)
-  let lnum = pos[1]
-  let col  = pos[2]
-
-  echom printf("mark '%s set: l_%d, c_%d", c, lnum, col)
+  " refresh vim-signature
+  execute 'SignatureRefresh'
 endfunction
 
 " ma       Set a mark 'a' at the current cursor position (lowercase = local)
@@ -756,12 +833,12 @@ inoremap <C-j> <Down>
 inoremap <C-k> <Up>
 inoremap <C-l> <Right>
 
-inoremap <C-w> <Esc>
-tnoremap <C-w> <C-\><C-n>
-vnoremap <C-w> <Esc>
+" inoremap <C-w> <Esc>
+" tnoremap <C-w> <C-\><C-n>
+" vnoremap <C-w> <Esc>
 " nnoremap <C-w> <Esc>
 
-nnoremap <Leader>v <C-q>
+nnoremap <leader>v <C-q>
 inoremap <C-q> <Esc>
 tnoremap <C-q> <C-\><C-n>
 vnoremap <C-q> <Esc>
@@ -807,13 +884,18 @@ vnoremap <S-l> >gv
 
 nnoremap 9 $
 vnoremap 9 $
+onoremap 9 $
+
+nnoremap D "_dd
+nnoremap C cc
+vnoremap d "_d
+
+" nnoremap D "_D
+" nnoremap dd "_dd
+" vnoremap d "_d
 
 " nnoremap H ^
 " nnoremap L $
-
-nnoremap D "_D
-nnoremap dd "_dd
-vnoremap d "_d
 
 set cursorline
 " set termguicolors
@@ -827,14 +909,19 @@ set cursorline
 " let g:catppuccin_no_italic = 0  " Allow italic text
 " colorscheme catppuccin
 
-syntax enable
+" syntax enable
 
 " Correct :Grep command that runs silently and opens quickfix
-command! -nargs=+ Grep execute 'silent! grep! <q-args>' | execute 'copen'
+" command! -nargs=+ Grep execute 'silent! grep! <q-args>' | execute 'copen'
+
+" set grepprg=rg\ --vimgrep\ --smart-case
+" set grepformat=%f:%l:%c:%m
+" command! -nargs=+ Grep silent execute 'grep! ' . <q-args> | copen | redraw!
 
 nnoremap <leader>uv :e $MYVIMRC<CR>
 nnoremap <leader>uV :source $MYVIMRC<CR>
 nnoremap <C-n> :call ToggleEx()<CR>
+" nnoremap <C-n> :Lexplore<CR>
 
 function! ToggleEx()
   if &filetype ==# 'netrw'
@@ -863,6 +950,8 @@ let g:netrw_liststyle = 3
 " 4 = previous window (most like NERDTree side panel)
 let g:netrw_browse_split = 0
 
+let g:netrw_winsize = 25
+
 autocmd FileType netrw nnoremap <buffer> <C-h> <C-w>h
 autocmd FileType netrw nnoremap <buffer> <C-j> <C-w>j
 autocmd FileType netrw nnoremap <buffer> <C-k> <C-w>k
@@ -883,11 +972,19 @@ augroup netrw_maps
     autocmd FileType netrw nmap <buffer> cd gn
     autocmd FileType netrw nmap <buffer> cc <CR>
     autocmd FileType netrw nmap <buffer> cC  :call NetrwCollapseAll()<CR>
+	autocmd FileType netrw nmap <buffer> nf %
+	autocmd FileType netrw nmap <buffer> nd d
 augroup END
 
 nnoremap c; q:
 
 cnoremap <C-q> <Esc>
+
+inoremap <C-s> <Nop>
+
+set grepprg=rg\ --vimgrep\ --smart-case
+set grepformat=%f:%l:%c:%m
+command! -nargs=+ Grep silent execute 'grep! ' . <q-args> | copen | redraw!
 
 " generate ctags based on pwd
 noremap <leader>ct :!ctags -R .<CR>
@@ -913,15 +1010,14 @@ let g:gruvbox_invert_selection=0
 let g:gruvbox_transparent_bg=0
 let g:gruvbox_contrast_dark="soft"
 
+syntax enable
 " Load Gruvbox
 colorscheme gruvbox
 
-" Optional overrides after loading the scheme
+" " Optional overrides after loading the scheme
 autocmd ColorScheme gruvbox hi Comment ctermfg=grey
-
 highlight SignColumn guibg=NONE ctermbg=NONE
 
-" syntax on
 " colorscheme monokai
 
 " Light mode -- PaperColor
@@ -941,10 +1037,9 @@ let g:indentLine_setColors      = 1      " enable colors
 let g:indentLine_showFirstIndentLevel = 1 " show first indent
 
 " tabs
-nnoremap <Leader>n :tabnew<CR>
-nnoremap <Leader>s :tab split<CR>
+nnoremap <leader>n :tabnew<CR>
+nnoremap <leader>s :tab split<CR>
 
-" Go to tab 1–9 using leader + number
 nnoremap <leader>1 1gt
 nnoremap <leader>2 2gt
 nnoremap <leader>3 3gt
@@ -956,18 +1051,49 @@ nnoremap <leader>8 8gt
 nnoremap <leader>9 9gt
 nnoremap <leader>0 :tablast<CR>
 
-nnoremap <Tab>1 1gt
-nnoremap <Tab>2 2gt
-nnoremap <Tab>3 3gt
-nnoremap <Tab>4 4gt
-nnoremap <Tab>5 5gt
-nnoremap <Tab>6 6gt
-nnoremap <Tab>7 7gt
-nnoremap <Tab>8 8gt
-nnoremap <Tab>9 9gt
-nnoremap <Tab>0 :tablast<CR>
+" let g:tab_mode = 0
+" let g:tab_timer = -1
+
+" function! TabUnlock(timer)
+"     let g:tab_mode = 0
+" 	let g:tab_timer = -1
+"     echo "Tab unlock"
+" endfunction
+
+" function! TabLock()
+"     let g:tab_mode = 1
+"     echo "Tab lock (3s)"
+
+"     " reset timer if already running
+"     if g:tab_timer != -1
+"         call timer_stop(g:tab_timer)
+"     endif
+
+"     let g:tab_timer = timer_start(3000, function('TabUnlock'))
+" endfunction
+
+" function! GoTab(n)
+"     execute a:n . "tabn"
+" endfunction
+
+" function! HandleTabKey(n)
+"     call GoTab(a:n)
+" endfunction
+
+" nnoremap <Tab> :call TabLock()<CR>
+
+" nnoremap <expr> 1 g:tab_mode ? ":call HandleTabKey(1)<CR>" : "1"
+" nnoremap <expr> 2 g:tab_mode ? ":call HandleTabKey(2)<CR>" : "2"
+" nnoremap <expr> 3 g:tab_mode ? ":call HandleTabKey(3)<CR>" : "3"
+" nnoremap <expr> 4 g:tab_mode ? ":call HandleTabKey(4)<CR>" : "4"
+" nnoremap <expr> 5 g:tab_mode ? ":call HandleTabKey(5)<CR>" : "5"
+" nnoremap <expr> 6 g:tab_mode ? ":call HandleTabKey(6)" : "6"
+" nnoremap <expr> 7 g:tab_mode ? ":call HandleTabKey(7)" : "7"
+" nnoremap <expr> 8 g:tab_mode ? ":call HandleTabKey(8)" : "8"
+" nnoremap <expr> 9 g:tab_mode ? ":call HandleTabKey(9)" : "9"
 
 " ---------------------------
+
 " find and replace
 nnoremap <leader>r :%s/
 " :%s/foo/bar/g       " g = replace all matches on a line
@@ -990,9 +1116,12 @@ nnoremap <leader>r :%s/
 " sql ft (bs key to gain back C-c)
 let g:ftplugin_sql_omni_key = '<C-j>'
 
+set timeout
 set ttimeoutlen=0
-set timeoutlen=300 " default is 1000 ms 
-set notimeout
+set timeoutlen=1000 " default is 1000 ms 
+" set notimeout " breaks esc 
+
+nnoremap zu zz14<C-e>
 
 " disable recording
 nnoremap q <Nop>
@@ -1018,8 +1147,14 @@ inoremap <C-Z> <Nop>
 vnoremap <C-Z> <Nop>
 cnoremap <C-Z> <Nop>
 tnoremap <C-Z> <Nop>
+" toggle captilization
+nnoremap <C-z> ~h
+vnoremap <C-z> g~
 
-nnoremap <Leader>\ :noh<CR>
+" nnoremap <C-z> u
+" inoremap <C-z> <C-o>u
+
+nnoremap <leader>\ :noh<CR>
 " nnoremap <Esc><Esc> :confirm bd<CR>
 " nnoremap <Esc><Esc> :confirm tabclose<CR>
 nnoremap <leader>q :confirm close<CR>
@@ -1108,20 +1243,21 @@ nnoremap <leader>q :confirm close<CR>
 " i vs a - 'i' = inside the object, 'a' = around the object (includes delimiters)
 " this can be used with c, d, v, y, etc.
 "
-" d$ - delete from cursor to end of line
+" d$						- delete from cursor to end of line
 
-" ctrl+q - gives visual block (i.e. like duplicated cursors) 
-" v + ctrl+q - gives column block selection
+" ctrl+q					- gives visual block (i.e. like duplicated cursors) 
+" v + ctrl+q				- gives column block selection
 "
-" ctrl + d - scroll down with key
-" ctrl + u - scroll up with key
-" Shift + w - move to next continuous word
-" Shift + e - move to next end of continuous word (basically like w/b/e but can
+" ctrl + d					- scroll down with key
+" ctrl + u					- scroll up with key
+" Shift + w					- move to next continuous word
+" Shift + e					- move to next end of continuous word (basically like w/b/e but can
 " just to next whitespace)
+" ge						- go to prev end of word
 "
-" f + character - targeted character jumps
-" ; to go to next instance of target
-" , to go back to previous instance
+" f + character				- targeted character jumps
+" ;							- to go to next instance of target
+" ,							- to go back to previous instance
 "
 " v + i + b - visual inside block
 " v + i " - visual inside quotes
@@ -1210,3 +1346,33 @@ nnoremap <leader>q :confirm close<CR>
 " - offsets apply when pressing n / N as well
 " - prefer /e instead of manual length offsets like /s+7
 " - useful for precise cursor placement in repetitive navigation
+"
+"/\cfoo				-> \c forces the search to ignore case
+"
+"dt + <char> -> delete up to char going right
+"df + <char> -> delete up to and including char going right
+"dT + <char> -> delete up to char going left
+
+"! sends highlighted block through external command
+
+" :sort n      " numeric sort
+" :sort u      " unique
+" :sort!       " reverse"
+"
+" pretty print json in vim
+" | Command       | Scope          |
+" | ------------- | -------------- |
+" | `:%!jq .`     | whole file     |
+" | `:'<,'>!jq .` | selection only |
+
+" gv				- reselect last visual selection
+
+" >>>>>>>>>> COLORS <<<<<<<<<<<<<
+" --- Try vim-signature possible groups ---
+" highlight SignatureMarkText ctermfg=yellow
+highlight link SignatureMarkText Identifier
+" highlight link SignatureMarkText WarningMsg
+highlight link SignatureMarkLine Identifier
+" highlight SignatureMarkTextHL ctermfg=yellow
+" highlight SignatureMarkLineHL ctermfg=yellow
+

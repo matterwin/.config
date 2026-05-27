@@ -1,12 +1,14 @@
+tabbed zathura -e '' -c
+
 # One page per row by default
 set pages-per-row 1
-set scroll-page-aware "true"
+set scroll-page-aware true
 set scroll-full-overlap 0.01
-set scroll-step 0.01
 set guioptions ""
 set selection-clipboard clipboard
-set render-loading "false"
-set scroll-step 50
+set render-loading false
+set scroll-step 25
+set adjust-open "best-fit"
 
 # maps
 map h scroll-left
@@ -19,7 +21,7 @@ map G  goto-last-page
 
 map = zoom in
 map - zoom out
-map + zoom in
+# map + zoom in
 
 map R rotate
 
@@ -57,8 +59,8 @@ set notification-fg "#151515" #00
 set recolor true
 set recolor-keephue false
 
-set recolor-lightcolor "#000000"
-set recolor-darkcolor  "#E0E0E0"
+set recolor-darkcolor  "#FFFFFF"
+set recolor-lightcolor "#272d2e"
 
 # Keybinds
 
