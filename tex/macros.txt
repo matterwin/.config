@@ -196,7 +196,7 @@
 
 % optionally:
 % \setcounter{secnumdepth}{0} % removes section numbers
-% \renewcommand{\arraystretch}{1.5}
+\renewcommand{\arraystretch}{1.5}
 % \DeclareMathSizes{<text size>}{<math size>}{<script size>}{<scriptscript size>}
 
 

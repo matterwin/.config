@@ -49,9 +49,10 @@ Plug 'NLKNguyen/papercolor-theme'
 Plug 'crusoexia/vim-monokai'
 Plug 'Yggdroot/indentLine'
 Plug 'nathanaelkane/vim-indent-guides'
-" Plug 'ryanoasis/vim-devicons'
 Plug 'pkradiator/netrw-file-icons'
+Plug 'ryanoasis/vim-devicons'
 Plug 'michaeljsmith/vim-indent-object'
+Plug 'Yggdroot/hiPairs'
 
 " Academic
 Plug 'lervag/vimtex'
@@ -174,13 +175,15 @@ endif
 nnoremap gd :LspDefinition<CR>
 nnoremap gD :LspDeclaration<CR>
 nnoremap gi <plug>(lsp-implementation)
-nnoremap K :LspHover <CR>
+nnoremap H :LspHover <CR>
 nnoremap gr :LspReferences<CR>
 " nnoremap <leader>rn :LspRename<CR>
 " nnoremap <leader>e :LspDiagnostic<CR>
 " nnoremap <leader>f :LspFormat<CR>
-nnoremap ]d :LspDiagnosticNext<CR>
-nnoremap [d :LspDiagnosticPrev<CR>
+" nnoremap ]d :LspDiagnosticNext<CR>
+" nnoremap [d :LspDiagnosticPrev<CR>
+nnoremap ]e :LspDiagnosticNext<CR>
+nnoremap [e :LspDiagnosticPrev<CR>
 
 let g:lsp_diagnostics_enabled = 0
 let g:lsp_signs_enabled = 0
@@ -255,6 +258,7 @@ let g:vimtex_view_method='zathura'
 let g:vimtex_quickfix_mode=0
 set conceallevel=0
 let g:tex_conceal='abdmg'
+let g:vimtex_syntax_conceal_disable = 1
 let g:vimtex_mappings_enabled = 0
 let g:vimtex#digestif#enabled = 0
 nnoremap \vc :VimtexCompile<CR>
@@ -403,7 +407,7 @@ xnoremap U <Nop>
 " Keybinding for fuzzy file search
 nnoremap <C-p> :Files<CR>
 " nnoremap <C-f> :Lines<CR>
-nnoremap <C-b> :Buffers<CR>
+" nnoremap <C-b> :Buffers<CR>
 " nnoremap <C-t> :Tags<CR>
 
 let g:fzf_layout = { 'down': '60%' }
@@ -452,25 +456,23 @@ tnoremap <Esc> <C-\><C-n>
 " tnoremap <C-M-k> <C-\><C-n>:TmuxNavigateUp<CR>
 " tnoremap <C-M-l> <C-\><C-n>:TmuxNavigateRight<CR>
 
+" search next/prev and center it
 nnoremap n nzzzv
 nnoremap N Nzzzv
+nnoremap # #zzzv
+nnoremap * #zzzv
 
 " vim-sneak
 let g:sneak#s_next = 1
 let g:sneak#label = 1
-
-" figure out how to be able to goto next word in visual mode or replace mode
 
 xmap s <Plug>Sneak_s
 xmap S <Plug>Sneak_S
 map f <Plug>Sneak_f
 map F <Plug>Sneak_F
 
-" map F <Plug>Sneak_F
-
-" S x y -> jump backward to xy
-
-nmap <leader>f ;
+" nnoremap <C-f> yl:normal f<C-r>0<CR>
+" nnoremap <C-F> yl:normal F<C-r>0<CR>
 
 " f/t  → tiny movement (single char)
 " s    → medium teleport (2 chars)
@@ -626,6 +628,10 @@ inoremap ,it \item
 inoremap ,pb \pbreak
 inoremap ,np \newpage
 
+" ) can be replaced with anything, ex: . to make a. instead of a)
+inoremap ,ba \begin{enumerate}[label=\alph*)]<CR><CR>\end{enumerate}<Esc>kA
+inoremap ,bA \begin{enumerate}[label=\Alph*)]<CR><CR>\end{enumerate}<Esc>kA
+inoremap ,be \begin{enumerate}<CR><CR>\end{enumerate}<Esc>kA
 inoremap ,bi \begin{itemize}<CR><CR>\end{itemize}<Esc>kA
 inoremap ,bq \begin{quote}<CR><CR>\end{quote}<Esc>kA
 inoremap ,bc \begin{center}<CR><CR>\end{center}<Esc>kA
@@ -644,62 +650,32 @@ inoremap ,pa \partial
 inoremap ,vp \vspace{}<Left>
 inoremap ,vb \verb\|\|<Left>
 inoremap ,vo \vocab{
-					
-" inoremap <C-w> <C-o>:call GoInside()<CR>
-
-" function! GoInside()
-"     let targets = ['{', '(', '[']
-
-"     let c = nr2char(getchar())
-
-"     if c < '1' || c > '3'
-"         return
-"     endif
-
-"     let idx = str2nr(c) - 1
-"     let t = targets[idx]
-
-"     execute "normal! f" . t . "a"
-" endfunction
-
-" noremap  <C-w>1 <Cmd>call GoInside(1)<CR><Right>
-" noremap  <C-w>2 <Cmd>call GoInside(2)<CR><Right>
-" noremap  <C-w>3 <Cmd>call GoInside(3)<CR><Right>
-
-" inoremap <C-w>1 <C-o>:call GoInside(1)<CR><Right>
-" inoremap <C-w>2 <C-o>:call GoInside(2)<CR><Right>
-" inoremap <C-w>3 <C-o>:call GoInside(3)<CR><Right>
-
-" function! GoInside(idx)
-"     let targets = ['{', '(', '[']
-"     let c = targets[a:idx - 1]
-"     execute "normal! f" . c . "a"
-" endfunction
+inoremap ,tf \therefore
 
 " ----- Lowercase -----
-inoremap ,a  \alpha
-inoremap ,b  \beta
-inoremap ,g  \gamma
-inoremap ,d  \delta
+inoremap ,aa  \alpha
+inoremap ,bt  \beta
+inoremap ,ga  \gamma
+inoremap ,da  \delta
 inoremap ,ep \epsilon
 inoremap ,ve \varepsilon
-inoremap ,z  \zeta
+inoremap ,za  \zeta
 inoremap ,th  \theta
-inoremap ,i  \iota
-inoremap ,k  \kappa
-inoremap ,l  \lambda
+inoremap ,ia  \iota
+inoremap ,ka  \kappa
+inoremap ,la  \lambda
 inoremap ,m  \mu
 inoremap ,n  \nu
 inoremap ,x  \xi
 inoremap ,p  \pi
 inoremap ,r  \rho
-inoremap ,s  \sigma
+inoremap ,sa  \sigma
 inoremap ,ta \tau
-inoremap ,u  \upsilon
+inoremap ,un  \upsilon
 inoremap ,ph \phi
 inoremap ,c \chi
 inoremap ,ps \psi
-inoremap ,o  \omega
+inoremap ,oa  \omega
 
 " ----- Variants -----
 inoremap ,vf \varphi
@@ -756,6 +732,69 @@ vnoremap ,gm F\vf{%
 nnoremap gm %
 vnoremap gm %
 
+function! ShowWORD()
+    let word = expand('<cWORD>')
+
+    " -------- BEGIN CASE --------
+    if word =~ '^\\begin{itemize}'
+        let depth = 0
+        let lnum = line('.')
+
+        while lnum < line('$')
+            let lnum += 1
+            let line = getline(lnum)
+
+            if line =~ '\\begin{itemize}'
+                let depth += 1
+            elseif line =~ '\\end{itemize}'
+                if depth == 0
+                    let col = match(line, '\\')
+                    call cursor(lnum, col + 1)
+                    return
+                endif
+                let depth -= 1
+            endif
+        endwhile
+
+        echo "No matching \\end found"
+        return
+
+    " -------- END CASE --------
+    elseif word =~ '^\\end{itemize}'
+        let depth = 0
+        let lnum = line('.')
+
+        while lnum > 1
+            let lnum -= 1
+            let line = getline(lnum)
+
+            if line =~ '\\end{itemize}'
+                let depth += 1
+            elseif line =~ '\\begin{itemize}'
+                if depth == 0
+                    let col = match(line, '\\')
+                    call cursor(lnum, col + 1)
+                    return
+                endif
+                let depth -= 1
+            endif
+        endwhile
+
+        echo "No matching \\begin found"
+        return
+    endif
+endfunction
+
+nnoremap <C-f> :call ShowWORD()<CR>
+vnoremap <C-f> :call ShowWORD()<CR>
+
+
+
+" \begin{itemize}
+" \begin{itemize}
+" \end{itemize}
+" \end{itemize}
+
 " doesnt work cause matchpairs needs asymmetric chars, so not $
 " set matchpairs+=$:$
 
@@ -791,8 +830,14 @@ set noswapfile
 nnoremap <leader>m :marks<CR>
 nnoremap <leader>M :SignatureToggle<CR>
 nnoremap ' `
-nnoremap m `
-nnoremap M :call SetMark()<CR>
+" nnoremap m `
+
+function! JumpToExactMark()
+  let c = nr2char(getchar())   " get the mark letter
+  execute "normal! `" . c . "zz"
+endfunction
+
+nnoremap m :call JumpToExactMark()<CR>
 
 function! SetMark()
   let c = nr2char(getchar())
@@ -803,6 +848,8 @@ function! SetMark()
   " refresh vim-signature
   execute 'SignatureRefresh'
 endfunction
+
+nnoremap M :call SetMark()<CR>
 
 " ma       Set a mark 'a' at the current cursor position (lowercase = local)
 " mA       Set a mark 'A' at current position (uppercase = global, persists across files)
@@ -858,11 +905,6 @@ nnoremap <M-S-Down>  :resize -2<CR>
 nnoremap <M-S-Right> :vertical resize -2<CR>
 nnoremap <M-S-Left>  :vertical resize +2<CR>
 
-nnoremap <M-S-H> :vertical resize -2<CR>
-nnoremap <M-S-L> :vertical resize +2<CR>
-nnoremap <M-S-K> :resize +2<CR>
-nnoremap <M-S-J> :resize -2<CR>
-
 " Tabs "
 filetype on
 filetype plugin indent on
@@ -886,6 +928,9 @@ nnoremap 9 $
 vnoremap 9 $
 onoremap 9 $
 
+" just do d9
+" nnoremap dt9 dt$
+
 nnoremap D "_dd
 nnoremap C cc
 vnoremap d "_d
@@ -901,14 +946,6 @@ set cursorline
 " set termguicolors
 " syntax on
 
-" let g:catppuccin_flavour = 'frappe'  " Use the 'frappe' flavour for darker background
-" let g:catppuccin_background = 'dark'  " Set the background to dark
-" let g:catppuccin_transparent_background = 0  " Disable transparent background
-" let g:catppuccin_dim_inactive = 1  " Disable dimming of inactive windows
-" let g:catppuccin_no_bold = 1  " Allow bold text
-" let g:catppuccin_no_italic = 0  " Allow italic text
-" colorscheme catppuccin
-
 " syntax enable
 
 " Correct :Grep command that runs silently and opens quickfix
@@ -918,8 +955,15 @@ set cursorline
 " set grepformat=%f:%l:%c:%m
 " command! -nargs=+ Grep silent execute 'grep! ' . <q-args> | copen | redraw!
 
-nnoremap <leader>uv :e $MYVIMRC<CR>
-nnoremap <leader>uV :source $MYVIMRC<CR>
+nnoremap <leader>uv :e ~/.vimrc<CR>
+nnoremap <leader>uV :source ~/.vimrc<CR>
+
+nnoremap <leader>ut :e ~/.tmux.conf<CR>
+nnoremap <leader>uT :call setreg('+', 'tmux source-file ~/.tmux.conf')<CR>
+
+nnoremap <leader>uh :e ~/.config/hypr/<CR>
+nnoremap <leader>uk :e ~/.config/kitty/kitty.conf<CR>
+
 nnoremap <C-n> :call ToggleEx()<CR>
 " nnoremap <C-n> :Lexplore<CR>
 
@@ -949,8 +993,7 @@ let g:netrw_liststyle = 3
 " 3 = new tab
 " 4 = previous window (most like NERDTree side panel)
 let g:netrw_browse_split = 0
-
-let g:netrw_winsize = 25
+" let g:netrw_winsize = '50%'
 
 autocmd FileType netrw nnoremap <buffer> <C-h> <C-w>h
 autocmd FileType netrw nnoremap <buffer> <C-j> <C-w>j
@@ -976,10 +1019,13 @@ augroup netrw_maps
 	autocmd FileType netrw nmap <buffer> nd d
 augroup END
 
+let g:WebDevIconsUnicodeDecorateFolderNodesDefaultSymbol = ''
+let g:DevIconsDefaultFolderOpenSymbol = ''
+
+" look at previous commands
 nnoremap c; q:
 
 cnoremap <C-q> <Esc>
-
 inoremap <C-s> <Nop>
 
 set grepprg=rg\ --vimgrep\ --smart-case
@@ -1002,7 +1048,7 @@ nnoremap <leader>cd :cd
 set background=dark
 
 " Enable Gruvbox customizations
-let g:gruvbox_italic=0
+let g:gruvbox_italic=1
 let g:gruvbox_bold=1
 let g:gruvbox_underline=1
 let g:gruvbox_undercurl=1
@@ -1010,13 +1056,22 @@ let g:gruvbox_invert_selection=0
 let g:gruvbox_transparent_bg=0
 let g:gruvbox_contrast_dark="soft"
 
+colorscheme gruvbox
 syntax enable
 " Load Gruvbox
-colorscheme gruvbox
 
 " " Optional overrides after loading the scheme
 autocmd ColorScheme gruvbox hi Comment ctermfg=grey
 highlight SignColumn guibg=NONE ctermbg=NONE
+
+" gets rid of bg color
+highlight Normal guibg=NONE ctermbg=NONE
+" highlight SignColumn guibg=NONE ctermbg=NONE
+" highlight LineNr guibg=NONE ctermbg=NONE
+" highlight FoldColumn guibg=NONE ctermbg=NONE
+" highlight VertSplit guibg=NONE ctermbg=NONE
+" highlight StatusLine guibg=NONE ctermbg=NONE
+" highlight StatusLineNC guibg=NONE ctermbg=NONE
 
 " colorscheme monokai
 
@@ -1032,9 +1087,20 @@ set mouse=a
 " iunmap <C-s>
 
 " Yggdroot/indentLine
-let g:indentLine_enabled        = 0      " enable indent lines
-let g:indentLine_setColors      = 1      " enable colors
-let g:indentLine_showFirstIndentLevel = 1 " show first indent
+" let g:indentLine_char_list = ['|', '¦', '┆', '┊']
+" let g:indentLine_char = '┊'
+" let g:indentLine_enabled        = 1      " enable indent lines
+" let g:indentLine_setColors      = 1      " enable colors
+" let g:indentLine_showFirstIndentLevel = 1 " show first indent
+let g:indentLine_setConceal = 0
+" let g:indentLine_concealcursor = ''
+
+" set list
+" set listchars=tab:▸\ ,trail:·,extends:>,precedes:<,space:·
+" set list
+" set listchars=eol:┊,tab:┊-,trail:·
+" hi whitespacewarning guibg=orange ctermbg=red
+" match whitespacewarning /\t\|\s\+$/
 
 " tabs
 nnoremap <leader>n :tabnew<CR>
@@ -1096,6 +1162,7 @@ nnoremap <leader>0 :tablast<CR>
 
 " find and replace
 nnoremap <leader>r :%s/
+vnoremap <leader>r :s/
 " :%s/foo/bar/g       " g = replace all matches on a line
 " :%s/foo/bar/c       " c = confirm each replacement
 " :%s/foo/bar/gi      " g + i = replace all, ignore case
@@ -1111,6 +1178,14 @@ nnoremap <leader>r :%s/
 " :%s/foo/bar/u       " u = undo as one block
 " :%s/foo/bar/\=expr  " \=expr = use expression to compute replacement
 " :%s/foo/bar/\~/     " \~ = toggle case of replaced text
+"
+" | Command   | Meaning               |
+" | --------- | --------------------- |
+" | `:%s`     | whole file            |
+" | `:1,$s`   | same as `%s`          |
+" | `:'<,'>s` | visual selection only |
+" | `:.,$s`   | current line → bottom |
+" | `:1,.s`   | top → current line    |
 " ---------------------------
 
 " sql ft (bs key to gain back C-c)
@@ -1121,11 +1196,20 @@ set ttimeoutlen=0
 set timeoutlen=1000 " default is 1000 ms 
 " set notimeout " breaks esc 
 
+" multiline (multi line) comment
+inoremap ,mc /**/<Esc><Left>i
+
 nnoremap zu zz14<C-e>
 
+" -- recording --
 " disable recording
-nnoremap q <Nop>
-vnoremap q <Nop>
+" nnoremap q <Nop>
+" vnoremap q <Nop>
+"
+" i maybe like recording
+" do qa to record a seq of keys
+" then ra to replay macro
+nnoremap r @
 
 " Map qd as Esc in all modes
 " " nnoremap qd <Esc>
@@ -1141,12 +1225,25 @@ vnoremap q <Nop>
 " snoremap <A-q> <Esc>
 " onoremap <A-q> <Esc>
 
+set nrformats+=alpha
+
 " I hit this a lot; begone background (fg fix)
 nnoremap <C-Z> <Nop>
 inoremap <C-Z> <Nop>
 vnoremap <C-Z> <Nop>
 cnoremap <C-Z> <Nop>
 tnoremap <C-Z> <Nop>
+
+" date and time
+inoremap <C-d> <C-R>=strftime("%Y-%m-%d")<CR>
+inoremap <C-t> <C-R>=strftime("%H:%M:%S")<CR>
+
+command! Date put=strftime('%Y-%m-%d')
+command! Timestamp put=strftime('%Y-%m-%d %H:%M:%S')
+
+inoremap ,date <C-R>=strftime("%Y-%m-%d")<CR>
+inoremap ,time <C-R>=strftime("%Y-%m-%d %H:%M:%S")<CR>
+
 " toggle captilization
 nnoremap <C-z> ~h
 vnoremap <C-z> g~
@@ -1163,7 +1260,8 @@ nnoremap <leader>q :confirm close<CR>
 " let g:indent_guides_enable_on_vim_startup = 1
 " let g:indent_guides_start_level = 1
 " let g:indent_guides_guide_size = 1
-" let g:indent_guides_draw_blank = 1
+" let g:indent_guides_draw_blank = 0
+" let g:indent_guides_auto_colors = 0
 
 " nnoremap <leader>tl :colorscheme PaperColor<CR>
 " nnoremap <leader>td :colorscheme gruvbox<CR>
@@ -1365,14 +1463,71 @@ nnoremap <leader>q :confirm close<CR>
 " | `:%!jq .`     | whole file     |
 " | `:'<,'>!jq .` | selection only |
 
-" gv				- reselect last visual selection
+" gv						- reselect last visual selection
+
+" <leader>v9A <input>		- visual block for at end of line
+"
+" gx						- open url under cursor into browser 
+" gf						- open a file under cursor
+" gv						- select previous visual
+
+" g Ctrl-a					- increment many lines sequentially
+" g Ctrl-x					- decrement many lines sequentially
+"
+" guw						- lowercase word
+" gUw						- uppercase word
+" guu						- lowercase entire line
+" gUU   					- uppercase entire line
+"
+" gU + motion				- transform that range
+" gu + motion				- transform that range
+"
+" visual mode + o			- switches cursor pos to top/bottom of selection
 
 " >>>>>>>>>> COLORS <<<<<<<<<<<<<
 " --- Try vim-signature possible groups ---
 " highlight SignatureMarkText ctermfg=yellow
-highlight link SignatureMarkText Identifier
+highlight link SignatureMarkText GruvboxBlue
 " highlight link SignatureMarkText WarningMsg
-highlight link SignatureMarkLine Identifier
+" highlight SignatureMarkLine ctermfg=yellow
+" highlight link SignatureMarkLine GruvboxBlue
 " highlight SignatureMarkTextHL ctermfg=yellow
 " highlight SignatureMarkLineHL ctermfg=yellow
+
+" 80 for blue
+hi MatchParen ctermfg=109
+
+let g:hiPairs_enable_matchParen = 1
+
+let g:hiPairs_hl_matchPair = {
+\ 'term'    : 'bold',
+\ 'cterm'   : 'bold',
+\ 'ctermfg' : '109',
+\ 'ctermbg' : 'NONE',
+\ 'gui'     : 'bold',
+\ 'guifg'   : '#87AFAF',
+\ 'guibg'   : 'NONE'
+\ }
+
+let g:hiPairs_hl_unmatchPair = {
+\ 'term'    : 'bold',
+\ 'cterm'   : 'bold',
+\ 'ctermfg' : 'Black',
+\ 'ctermbg' : '167',
+\ 'gui'     : 'bold',
+\ 'guifg'   : 'NONE',
+\ 'guibg'   : 'NONE' 
+\ }
+
+" 80 electric blue
+" #D75F5F or 167
+" #87AFAF or 109
+" #FBAC06 or 214
+" #BF55EC or 135
+
+" TODO
+" do a keybind that can goto next synatx error via lsp
+
+nnoremap J <C-e>
+nnoremap K <C-y>
 

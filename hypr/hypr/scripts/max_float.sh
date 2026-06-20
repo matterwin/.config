@@ -7,22 +7,8 @@ WIN=$(hyprctl activewindow | grep -oP '(?<=handle: )\d+')
 #     .[] | select(.focused==true) | "\(.x) \(.y) \(.width) \(.height) \(.transform)"')
 
 # workspace 
-# read X Y W H TRANSFORM <<< $(hyprctl monitors -j | jq -r '
-#     .[] | select(.focused==true) | "\(.workarea.x // .x) \(.workarea.y // .y) \(.workarea.width // .width) \(.workarea.height // .height) \(.transform)"')
-
-read X Y W H SCALE TRANSFORM <<< $(hyprctl monitors -j | jq -r '
-  .[] | select(.focused==true) |
-  "\(.workarea.x // .x) \(.workarea.y // .y) \(.workarea.width // .width) \(.workarea.height // .height) \(.scale) \(.transform)"')
-
-# Get monitor info for the focused monitor
-# read X Y W H SCALE TRANSFORM <<< $(hyprctl monitors -j | jq -r '
-#   .[] | select(.focused==true) |
-#   "\(.workarea.x // .x)
-#    \(.workarea.y // .y)
-#    \(.workarea.width // .width)
-#    \(.workarea.height // .height)
-#    \(.scale)
-#    \(.transform)"')
+read X Y W H TRANSFORM <<< $(hyprctl monitors -j | jq -r '
+    .[] | select(.focused==true) | "\(.workarea.x // .x) \(.workarea.y // .y) \(.workarea.width // .width) \(.workarea.height // .height) \(.transform)"')
 
 # Adjust width/height based on transform
 case $TRANSFORM in
