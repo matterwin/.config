@@ -1209,7 +1209,8 @@ nnoremap zu zz14<C-e>
 " i maybe like recording
 " do qa to record a seq of keys
 " then ra to replay macro
-nnoremap r @
+" press q to record then attach it to a keybind
+nnoremap r @ 
 
 " Map qd as Esc in all modes
 " " nnoremap qd <Esc>
