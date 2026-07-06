@@ -1,0 +1,4 @@
+if via isn't working on linux do:
+sudo chmod a+rw /dev/hidraw*
+
+

@@ -1,6 +1,54 @@
 let mapleader = " "
 
+" --------------------------------------- "
+" --- settings first ---
+
+let g:python_recommended_style = 0
+let g:polyglot_disabled = ['python-indent']
+
+let g:cpp_class_scope_highlight = 1
+let g:cpp_member_variable_highlight = 1
+let g:cpp_experimental_template_highlight = 1
+
+" gruvbox
+let g:gruvbox_italic=1
+let g:gruvbox_bold=1
+let g:gruvbox_underline=1
+let g:gruvbox_undercurl=1
+let g:gruvbox_invert_selection=0
+let g:gruvbox_transparent_bg=0
+let g:gruvbox_contrast_dark="dark"
+
+" gruvbox-material
+set background=dark
+
+let g:gruvbox_material_background = 'soft'      " soft, medium, hard
+let g:gruvbox_material_foreground = 'mix'  " material, mix, original
+let g:gruvbox_material_enable_italic = 1
+let g:gruvbox_material_transparent_background = 0
+let g:gruvbox_material_better_performance = 1
+
+
+" Yggdroot/indentLine
+" let g:indentLine_char_list = ['|', '¦', '┆', '┊']
+" let g:indentLine_char = '┊'
+" let g:indentLine_enabled        = 1      " enable indent lines
+" let g:indentLine_setColors      = 1      " enable colors
+" let g:indentLine_showFirstIndentLevel = 1 " show first indent
+let g:indentLine_setConceal = 0
+" let g:indentLine_concealcursor = ''
+
+" asyncomplete
+let g:asyncomplete_auto_popup = 1
+
+" lsp
+let g:lsp_diagnostics_enabled = 0
+let g:lsp_signs_enabled = 0
+
+" --------------------------------------- "
+
 "source ~/.vimrc
+
 " --------------------------------------- "
 " Installs
 
@@ -28,6 +76,7 @@ let mapleader = " "
 " PlugInstall --------------------
 call plug#begin('~/.vim/plugged')
 Plug 'christoomey/vim-tmux-navigator'
+" Functional
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 " switched to netrw
@@ -41,11 +90,11 @@ Plug 'google/vim-searchindex'
 " Aesthetics
 Plug 'ap/vim-css-color'
 Plug 'kshenoy/vim-signature'
-Plug 'catppuccin/nvim', { 'as': 'catppuccin' }
 Plug 'itchyny/lightline.vim'
 Plug 'morhetz/gruvbox'
+Plug 'sainnhe/gruvbox-material'
+Plug 'vague-theme/vague.vim'
 Plug 'itchyny/vim-gitbranch'
-Plug 'NLKNguyen/papercolor-theme'
 Plug 'crusoexia/vim-monokai'
 Plug 'Yggdroot/indentLine'
 Plug 'nathanaelkane/vim-indent-guides'
@@ -53,6 +102,7 @@ Plug 'pkradiator/netrw-file-icons'
 Plug 'ryanoasis/vim-devicons'
 Plug 'michaeljsmith/vim-indent-object'
 Plug 'Yggdroot/hiPairs'
+Plug 'sheerun/vim-polyglot'
 
 " Academic
 Plug 'lervag/vimtex'
@@ -67,10 +117,19 @@ Plug 'dense-analysis/ale'
 call plug#end()
 " ---------------------------------
 
-" :let g:use_markdown = 1
-" :let g:use_markdown = 0
+" --- colorscheme ---
+" current colorscheme
+" https://github.com/vague-theme/vague.nvim
+" set termguicolors
+" colorscheme vague
 
-"Unbind section
+" set notermguicolors
+" colorscheme gruvbox
+
+" set notermguicolors
+colorscheme gruvbox-material
+
+" --- Unbind Nop section ---
 
 " disable predefined C-w, includes: splits, etc
 " nnoremap <C-w> <Nop>
@@ -81,10 +140,9 @@ call plug#end()
 
 map <C-w> <Nop>
 map Q <Nop>
+inoremap <C-_> <Nop>
 
-nnoremap <C-1> :echo "hello"<CR>
-
-let g:asyncomplete_auto_popup = 1
+" -------------------------
 
 "" Vim Lsp:
 filetype plugin on
@@ -174,7 +232,7 @@ endif
 " Keybindings for LSP features
 nnoremap gd :LspDefinition<CR>
 nnoremap gD :LspDeclaration<CR>
-nnoremap gi <plug>(lsp-implementation)
+" nnoremap gi <plug>(lsp-implementation)
 nnoremap H :LspHover <CR>
 nnoremap gr :LspReferences<CR>
 " nnoremap <leader>rn :LspRename<CR>
@@ -185,8 +243,6 @@ nnoremap gr :LspReferences<CR>
 nnoremap ]e :LspDiagnosticNext<CR>
 nnoremap [e :LspDiagnosticPrev<CR>
 
-let g:lsp_diagnostics_enabled = 0
-let g:lsp_signs_enabled = 0
 set signcolumn=no
 set foldcolumn=0
 
@@ -341,25 +397,28 @@ endfunction
 let s:p = {'normal': {}, 'inactive': {}, 'insert': {}, 'replace': {}, 'visual': {}, 'tabline': {}}
 
 " --- Statusline ---
-let s:p.normal.left   = [ ['black', 'white', 15, 238], ['black', 'white', 15, 238] ]
-let s:p.normal.middle = [ ['black', 'white', 15, 238] ]
-let s:p.normal.right  = [ ['black', 'white', 15, 238] ]
+let s:p.normal.left   = [ ['#d1d1d1', '#47354a', 15, 238] ]
+let s:p.normal.middle = [ ['#d1d1d1', '#47354a', 15, 238] ]
+let s:p.normal.right  = [ ['#d1d1d1', '#47354a', 15, 238] ]
+
+" #584961
 
 " a way to change other colors for other modes
 " let s:p.visual.left   = [ ['black', 'white', 142, 238], ['black', 'white', 15, 238] ]
 
-let s:p.inactive.left   = [ ['black', 'white', 'black', 238 ] ]
-let s:p.inactive.middle = [ ['black', 'white', 'black', 238 ] ]
-let s:p.inactive.right  = [ ['black', 'white', 'black', 238 ] ]
-
+let s:p.inactive.left   = [ ['#878787', '#1c1c24', 'black', 238 ] ]
+let s:p.inactive.middle = [ ['#878787', '#1c1c24', 'black', 238 ] ]
+let s:p.inactive.right  = [ ['#878787', '#1c1c24', 'black', 238 ] ]
+ 
 " --- Tabline ---
+
 " Active tab
-let s:p.tabline.tabsel = [ ['black', 'white', 15, 238] ]
+let s:p.tabline.tabsel = [ ['white', '#584961', 15, 238] ]
 
 " Inactive tabs
-let s:p.tabline.left   = [ ['white', 'grey', 'grey', 'NONE'] ]
-let s:p.tabline.middle = [ ['white', 'grey', 'grey', 'NONE'] ]
-let s:p.tabline.right  = [ ['white', 'grey', 'grey', 'NONE'] ]
+let s:p.tabline.left   = [ ['#d1d1d1', 'NONE', 'grey', 'NONE'] ]
+let s:p.tabline.middle = [ ['#d1d1d1', 'NONE', 'grey', 'NONE'] ]
+let s:p.tabline.right  = [ ['#d1d1d1', 'NONE', 'grey', 'NONE'] ]
 
 " Apply palette
 let g:lightline#colorscheme#mytheme#palette = lightline#colorscheme#fill(s:p)
@@ -466,8 +525,8 @@ nnoremap * #zzzv
 let g:sneak#s_next = 1
 let g:sneak#label = 1
 
-xmap s <Plug>Sneak_s
-xmap S <Plug>Sneak_S
+map s <Plug>Sneak_s
+map S <Plug>Sneak_S
 map f <Plug>Sneak_f
 map F <Plug>Sneak_F
 
@@ -623,10 +682,13 @@ inoremap ,b{ \Big\{  \Big\}<Left><Left><Left>
 inoremap ,ss \subsection*{}<Left>
 inoremap ,pg \paragraph{}<Left>
 inoremap ,tt \text{}<Left>
-inoremap ,ti \textit{}<Left>
-inoremap ,it \item
+inoremap ,it \textit{}<Left>
+inoremap ,tm \item
+inoremap ,im \item
 inoremap ,pb \pbreak
 inoremap ,np \newpage
+inoremap ,ud \underline{
+inoremap ,em ---
 
 " ) can be replaced with anything, ex: . to make a. instead of a)
 inoremap ,ba \begin{enumerate}[label=\alph*)]<CR><CR>\end{enumerate}<Esc>kA
@@ -636,7 +698,9 @@ inoremap ,bi \begin{itemize}<CR><CR>\end{itemize}<Esc>kA
 inoremap ,bq \begin{quote}<CR><CR>\end{quote}<Esc>kA
 inoremap ,bc \begin{center}<CR><CR>\end{center}<Esc>kA
 inoremap ,bv \begin{verbatim}<CR><CR>\end{verbatim}<Esc>kA
+inoremap ,cb \begin{tcolorbox}<CR><CR>\end{tcolorbox}<Esc>kA
 inoremap ,eq \begin{equation*}<CR><CR>\end{equation*}<Esc>kA
+inoremap ,bm \begin{multicols}{1}<CR><CR>\end{multicols}<Esc>kA
 inoremap ,ar \begin{array}<CR><CR>\end{array}<Esc>kA
 inoremap ,al \begin{align*}<CR><CR>\end{align*}<C-o>k
 inoremap ,tb \textbf{}<Left>
@@ -651,6 +715,8 @@ inoremap ,vp \vspace{}<Left>
 inoremap ,vb \verb\|\|<Left>
 inoremap ,vo \vocab{
 inoremap ,tf \therefore
+inoremap ,bo \boxednote{<CR><CR>}<Esc>kA
+"<CR> is a carriage return in vim
 
 " ----- Lowercase -----
 inoremap ,aa  \alpha
@@ -788,7 +854,8 @@ endfunction
 nnoremap <C-f> :call ShowWORD()<CR>
 vnoremap <C-f> :call ShowWORD()<CR>
 
-
+nnoremap csl :set cursorline! \| echo "cursorline: " . (&cursorline ? "ON" : "OFF")<CR>
+nnoremap csc :set cursorcolumn! \| echo "cursorcolumn: " . (&cursorcolumn ? "ON" : "OFF")<CR>
 
 " \begin{itemize}
 " \begin{itemize}
@@ -825,8 +892,8 @@ nnoremap <leader>w :w<CR>
 set splitbelow
 set splitright
 set noswapfile
-
-" marks 
+				
+" --- marks ---
 nnoremap <leader>m :marks<CR>
 nnoremap <leader>M :SignatureToggle<CR>
 nnoremap ' `
@@ -932,19 +999,23 @@ onoremap 9 $
 " nnoremap dt9 dt$
 
 nnoremap D "_dd
+nnoremap dl "_dd
 nnoremap C cc
+nnoremap cl cc
+vnoremap d "_d
+nnoremap d "_d
 vnoremap d "_d
 
-" nnoremap D "_D
-" nnoremap dd "_dd
-" vnoremap d "_d
+" explicit deletion
+nnoremap d9 d$
+nnoremap d0 d0
 
 " nnoremap H ^
 " nnoremap L $
 
 set cursorline
 " set termguicolors
-" syntax on
+syntax on
 
 " syntax enable
 
@@ -1026,6 +1097,7 @@ let g:DevIconsDefaultFolderOpenSymbol = ''
 nnoremap c; q:
 
 cnoremap <C-q> <Esc>
+" inoremap jj <Esc><Right>
 inoremap <C-s> <Nop>
 
 set grepprg=rg\ --vimgrep\ --smart-case
@@ -1047,18 +1119,7 @@ nnoremap <leader>cd :cd
 " Dark mode -- Gruvbox
 set background=dark
 
-" Enable Gruvbox customizations
-let g:gruvbox_italic=1
-let g:gruvbox_bold=1
-let g:gruvbox_underline=1
-let g:gruvbox_undercurl=1
-let g:gruvbox_invert_selection=0
-let g:gruvbox_transparent_bg=0
-let g:gruvbox_contrast_dark="soft"
-
-colorscheme gruvbox
 syntax enable
-" Load Gruvbox
 
 " " Optional overrides after loading the scheme
 autocmd ColorScheme gruvbox hi Comment ctermfg=grey
@@ -1073,27 +1134,12 @@ highlight Normal guibg=NONE ctermbg=NONE
 " highlight StatusLine guibg=NONE ctermbg=NONE
 " highlight StatusLineNC guibg=NONE ctermbg=NONE
 
-" colorscheme monokai
-
-" Light mode -- PaperColor
-" set background=light
-" set t_Co=256
-" colorscheme PaperColor
-
 set mouse=a
 " set ttymouse=
 
 " Disable Ctrl+S in insert mode completely
 " iunmap <C-s>
 
-" Yggdroot/indentLine
-" let g:indentLine_char_list = ['|', '¦', '┆', '┊']
-" let g:indentLine_char = '┊'
-" let g:indentLine_enabled        = 1      " enable indent lines
-" let g:indentLine_setColors      = 1      " enable colors
-" let g:indentLine_showFirstIndentLevel = 1 " show first indent
-let g:indentLine_setConceal = 0
-" let g:indentLine_concealcursor = ''
 
 " set list
 " set listchars=tab:▸\ ,trail:·,extends:>,precedes:<,space:·
@@ -1193,11 +1239,11 @@ let g:ftplugin_sql_omni_key = '<C-j>'
 
 set timeout
 set ttimeoutlen=0
-set timeoutlen=1000 " default is 1000 ms 
+set timeoutlen=800 " default is 1000 ms 
 " set notimeout " breaks esc 
 
 " multiline (multi line) comment
-inoremap ,mc /**/<Esc><Left>i
+inoremap ,/ /**/<Esc><Left>i
 
 nnoremap zu zz14<C-e>
 
@@ -1226,7 +1272,9 @@ nnoremap r @
 " snoremap <A-q> <Esc>
 " onoremap <A-q> <Esc>
 
-set nrformats+=alpha
+" enable if you want C-a or C-x to also
+" increment/decrement letters instead of #s only
+" set nrformats+=alpha
 
 " I hit this a lot; begone background (fg fix)
 nnoremap <C-Z> <Nop>
@@ -1265,7 +1313,8 @@ nnoremap <leader>q :confirm close<CR>
 " let g:indent_guides_auto_colors = 0
 
 " nnoremap <leader>tl :colorscheme PaperColor<CR>
-" nnoremap <leader>td :colorscheme gruvbox<CR>
+nnoremap <leader>td :colorscheme gruvbox<CR>:set notermguicolors<CR>
+nnoremap <leader>tv :colorscheme vague<CR>:set termguicolors<CR>
 
 " nnoremap <leader>bd :set background=dark<CR>
 " nnoremap <leader>bl :set background=light<CR>
@@ -1448,9 +1497,10 @@ nnoremap <leader>q :confirm close<CR>
 "
 "/\cfoo				-> \c forces the search to ignore case
 "
-"dt + <char> -> delete up to char going right
-"df + <char> -> delete up to and including char going right
-"dT + <char> -> delete up to char going left
+"dt <char>					- delete forwards to char exclusive 
+"dT <char>					- delete backwards to char exclusive 
+"df <char>					- delete forwards to char inclusive 
+"dF <char>					- delete backwards to char inclusive 
 
 "! sends highlighted block through external command
 
@@ -1464,8 +1514,6 @@ nnoremap <leader>q :confirm close<CR>
 " | `:%!jq .`     | whole file     |
 " | `:'<,'>!jq .` | selection only |
 
-" gv						- reselect last visual selection
-
 " <leader>v9A <input>		- visual block for at end of line
 "
 " gx						- open url under cursor into browser 
@@ -1475,6 +1523,7 @@ nnoremap <leader>q :confirm close<CR>
 " g Ctrl-a					- increment many lines sequentially
 " g Ctrl-x					- decrement many lines sequentially
 "
+"							captialization (can do a better custom job here)
 " guw						- lowercase word
 " gUw						- uppercase word
 " guu						- lowercase entire line
@@ -1483,30 +1532,43 @@ nnoremap <leader>q :confirm close<CR>
 " gU + motion				- transform that range
 " gu + motion				- transform that range
 "
+" g'						- go to the newer change location
+" g;						- go to the previous change location
+" gi						- place the cursor at the same position where it was left last time in the Insert mode
+"
 " visual mode + o			- switches cursor pos to top/bottom of selection
 
-" >>>>>>>>>> COLORS <<<<<<<<<<<<<
-" --- Try vim-signature possible groups ---
-" highlight SignatureMarkText ctermfg=yellow
+" --- future vim custom features ---
+" - figure out the filetype you're in, then
+"   perform certain actions for that filetype that
+"   would be similar across different files but have the same keybind
+"   Example: goto end of block line via idention in python, c/c++/java would
+"   be maybe have a count of {} and pick the last } line... etc
+
+nnoremap J <C-e>
+nnoremap K <C-y>
+
+" hiPairs
 highlight link SignatureMarkText GruvboxBlue
-" highlight link SignatureMarkText WarningMsg
-" highlight SignatureMarkLine ctermfg=yellow
-" highlight link SignatureMarkLine GruvboxBlue
-" highlight SignatureMarkTextHL ctermfg=yellow
-" highlight SignatureMarkLineHL ctermfg=yellow
 
 " 80 for blue
-hi MatchParen ctermfg=109
+hi MatchParen ctermfg=135 guifg=#BF55EC
 
+" 80 electric blue
+" #D75F5F or 167
+" #87AFAF or 109
+" #FBAC06 or 214
+" #BF55EC or 135
+"
 let g:hiPairs_enable_matchParen = 1
 
 let g:hiPairs_hl_matchPair = {
 \ 'term'    : 'bold',
 \ 'cterm'   : 'bold',
-\ 'ctermfg' : '109',
+\ 'ctermfg' : '135',
 \ 'ctermbg' : 'NONE',
 \ 'gui'     : 'bold',
-\ 'guifg'   : '#87AFAF',
+\ 'guifg'   : '#BF55EC',
 \ 'guibg'   : 'NONE'
 \ }
 
@@ -1517,18 +1579,8 @@ let g:hiPairs_hl_unmatchPair = {
 \ 'ctermbg' : '167',
 \ 'gui'     : 'bold',
 \ 'guifg'   : 'NONE',
-\ 'guibg'   : 'NONE' 
+\ 'guibg'   : 'NONE'
 \ }
 
-" 80 electric blue
-" #D75F5F or 167
-" #87AFAF or 109
-" #FBAC06 or 214
-" #BF55EC or 135
 
-" TODO
-" do a keybind that can goto next synatx error via lsp
-
-nnoremap J <C-e>
-nnoremap K <C-y>
-
+" vim can only detect my variables if i close and reopen vim
