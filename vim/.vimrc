@@ -1,4 +1,7 @@
 let mapleader = " "
+set belloff=all
+set path+=**
+set wildmenu
 
 " --------------------------------------- "
 " --- settings first ---

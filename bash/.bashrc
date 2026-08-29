@@ -43,3 +43,19 @@ export LD_LIBRARY_PATH=/opt/cuda/lib64:$LD_LIBRARY_PATH
 export PATH=/opt/nvidia/nsight-systems/2020.5.1/target-linux-x64:$PATH
 
 export PATH="$HOME/.local/bin:$PATH"
+
+alias cdrive='cd /mnt/c/Users/MERWIN'
+
+msedge() {
+	"/mnt/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe" \
+		"$(wslpath -w "$1")"
+}
+
+export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
+
+alias ,date='date +%F'
+alias wfe='explorer.exe'
+
+datet() {
+	touch "$(date +%F).txt"
+}
