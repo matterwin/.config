@@ -3,18 +3,31 @@ set belloff=all
 set path+=**
 set wildmenu
 
+cabbrev fd find
+
+" --- commands ---
+command! Pwdc echo expand('%p') | call system('clip.exe', expand('%p'))
+command! Pwd echo expand('%p')
+nnoremap <leader>p :echo expand('%p')<CR>
+
 " --------------------------------------- "
 " --- settings first ---
+"
+" let g:WebDevIconsUnicodeDecorateFolderNodesDefaultSymbol = ''
+" let g:DevIconsDefaultFolderOpenSymbol = ''
 
-let g:python_recommended_style = 0
-let g:polyglot_disabled = ['python-indent']
+" let g:python_recommended_style = 0
+let g:polyglot_disabled = ['python-indent', 'autoindent', 'powershell']
 
 let g:cpp_class_scope_highlight = 1
 let g:cpp_member_variable_highlight = 1
 let g:cpp_experimental_template_highlight = 1
 
+let g:gitgutter_map_keys = 0
+let g:gitgutter_enabled = 0
+
 " gruvbox
-let g:gruvbox_italic=1
+let g:gruvbox_italic=0
 let g:gruvbox_bold=1
 let g:gruvbox_underline=1
 let g:gruvbox_undercurl=1
@@ -27,10 +40,9 @@ set background=dark
 
 let g:gruvbox_material_background = 'soft'      " soft, medium, hard
 let g:gruvbox_material_foreground = 'mix'  " material, mix, original
-let g:gruvbox_material_enable_italic = 1
+let g:gruvbox_material_enable_italic = 0
 let g:gruvbox_material_transparent_background = 0
 let g:gruvbox_material_better_performance = 1
-
 
 " Yggdroot/indentLine
 " let g:indentLine_char_list = ['|', '¦', '┆', '┊']
@@ -89,6 +101,12 @@ Plug 'tpope/vim-commentary'
 Plug 'rking/ag.vim'
 Plug 'farmergreg/vim-lastplace'
 Plug 'google/vim-searchindex'
+Plug 'airblade/vim-gitgutter'
+Plug 'tpope/vim-fugitive'
+Plug 'rhysd/conflict-marker.vim'
+
+" LLMs
+" Plug 'github/copilot.vim'
 
 " Aesthetics
 Plug 'ap/vim-css-color'
@@ -101,8 +119,8 @@ Plug 'itchyny/vim-gitbranch'
 Plug 'crusoexia/vim-monokai'
 Plug 'Yggdroot/indentLine'
 Plug 'nathanaelkane/vim-indent-guides'
-Plug 'pkradiator/netrw-file-icons'
-Plug 'ryanoasis/vim-devicons'
+" Plug 'pkradiator/netrw-file-icons'
+" Plug 'ryanoasis/vim-devicons'
 Plug 'michaeljsmith/vim-indent-object'
 Plug 'Yggdroot/hiPairs'
 Plug 'sheerun/vim-polyglot'
@@ -121,15 +139,12 @@ call plug#end()
 " ---------------------------------
 
 " --- colorscheme ---
-" current colorscheme
+set termguicolors
+" set notermguicolors
+"
 " https://github.com/vague-theme/vague.nvim
-" set termguicolors
 " colorscheme vague
-
-" set notermguicolors
 " colorscheme gruvbox
-
-" set notermguicolors
 colorscheme gruvbox-material
 
 " --- Unbind Nop section ---
@@ -144,6 +159,7 @@ colorscheme gruvbox-material
 map <C-w> <Nop>
 map Q <Nop>
 inoremap <C-_> <Nop>
+map <C-b> <Nop>
 
 " -------------------------
 
@@ -235,8 +251,9 @@ endif
 " Keybindings for LSP features
 nnoremap gd :LspDefinition<CR>
 nnoremap gD :LspDeclaration<CR>
+" gf		- goes to file (vim command)
 " nnoremap gi <plug>(lsp-implementation)
-nnoremap H :LspHover <CR>
+nnoremap gh :LspHover <CR>
 nnoremap gr :LspReferences<CR>
 " nnoremap <leader>rn :LspRename<CR>
 " nnoremap <leader>e :LspDiagnostic<CR>
@@ -320,15 +337,68 @@ let g:tex_conceal='abdmg'
 let g:vimtex_syntax_conceal_disable = 1
 let g:vimtex_mappings_enabled = 0
 let g:vimtex#digestif#enabled = 0
+let g:vimtex_view_automatic = 1
 nnoremap \vc :VimtexCompile<CR>
 nnoremap \vv :VimtexView<CR>
 
 " sudo apt install texlive-latex-base latexmk zathura zathura-pdf-poppler
 " To compile: latexmk -pdf main.tex or pdflatex main.tex
+" or pdflatex <file.tex>
 " To view pdf: zathura main.pdf & or explorer.exe main.pdf (this is for wsl)
 
 set hlsearch
 set incsearch
+
+" --- gitgutter ---
+"  disabled by default
+let g:gitgutter_enabled = 0
+nnoremap <leader>gd :Gvdiffsplit<CR>
+nnoremap <leader>gt :GitGutterToggle<CR>
+
+" :GitGutterToggle
+" ]c		- next change
+" [c		- prev change
+" :Gdiffsplit		- full file diff against 
+" :GitGutterPreviewHunk		- see a certain line/block git diff
+" :GitGutterUndoHunk		- undo hunk
+" :Gdiffsplit				- diff against index/HEAD
+" :Gvdiffsplt				- vertical diff split
+" :Git difftool				- external difftool
+" --- ---
+"
+"  --- git fugitive ---
+nnoremap <leader>gb :Git blame<CR> :tab split<CR>
+nnoremap <leader>gB :!git blame %<CR>
+
+" :GIt blame
+" :!git blame %				- regular git blame no plugins for cur file
+" --- ---
+"
+" --- rhysd/conflict-marker.vim ---
+let g:conflict_marker_enable_mappings = 1
+nnoremap <leader>cm :let g:conflict_marker_enable_mappings = !g:conflict_marker_enable_mappings<CR>
+
+" disable the default highlight group
+let g:conflict_marker_highlight_group = ''
+
+" include text after begin and end markers
+let g:conflict_marker_begin = '^<<<<<<<\+ .*$'
+let g:conflict_marker_common_ancestors = '^|||||||\+ .*$'
+let g:conlict_marker_end = '^>>>>>>>\+ .*$'
+
+highlight ConflictMarkerBegin guibg=#2f7366
+highlight ConflictMarkerOurs guibg=#2e5049
+highlight ConflictMarkerTheirs guibg=#344f69
+highlight ConflictMarkerEnd guibg=#2f628e
+highlight ConflictMarkerCommonAncestorsHunk guibg=#754a81
+
+" [x and ]x					- jump among conflict markers
+" --- ---
+"
+" --- copilot ---
+let g:copilot_enabled = 0
+nnoremap <leader>co :Copilot toggle<CR>
+" --- ---
 
 " ------------------------------
 " Statusline config (bottom bar and tabs)
@@ -400,9 +470,9 @@ endfunction
 let s:p = {'normal': {}, 'inactive': {}, 'insert': {}, 'replace': {}, 'visual': {}, 'tabline': {}}
 
 " --- Statusline ---
-let s:p.normal.left   = [ ['#d1d1d1', '#47354a', 15, 238] ]
-let s:p.normal.middle = [ ['#d1d1d1', '#47354a', 15, 238] ]
-let s:p.normal.right  = [ ['#d1d1d1', '#47354a', 15, 238] ]
+let s:p.normal.left   = [ ['#d1d1d1', '#5f4664', 15, 238] ]
+let s:p.normal.middle = [ ['#d1d1d1', '#5f4664', 15, 238] ]
+let s:p.normal.right  = [ ['#d1d1d1', '#5f4664', 15, 238] ]
 
 " #584961
 
@@ -467,12 +537,22 @@ xnoremap U <Nop>
 
 " fzf
 " Keybinding for fuzzy file search
+let $FZF_DEFAULT_COMMAND = 'rg --files --hidden --glob "!.git"'
+
+" tab			- mark files for multi-select
+" enter			- open selected files as buffers
+" ctrl-t		- open selected files in new Vim tabs
+" ctrl-x		- open in horizontal split
+" ctrl-v		- open in vertical split
+
 nnoremap <C-p> :Files<CR>
 " nnoremap <C-f> :Lines<CR>
-" nnoremap <C-b> :Buffers<CR>
-" nnoremap <C-t> :Tags<CR>
+nnoremap <C-b> :Buffers<CR>
+nnoremap <C-t> :Tags<CR>
 
-let g:fzf_layout = { 'down': '60%' }
+let g:fzf_layout = { 'down': '100%' }
+let g:fzf_vim = {}
+let g:fzf_vim.preview_window = ['up:50%']
 
 " command! -bang -nargs=* Tags
 "     \ call fzf#vim#tags('', fzf#vim#with_preview(), <bang>0)
@@ -554,76 +634,15 @@ map F <Plug>Sneak_F
 " prompts for pattern in cwd
 " nnoremap <C-g>g :Ag<Space>
 
-function! AgCursorWord()
-    execute 'Ag ' . expand('<cword>')
+" function! AgCursorWord()
+"     execute 'Ag ' . expand('<cword>')
+" endfunction
+" nnoremap <C-g> :call AgCursorWord()<CR>
+
+function! RgCursorWord()
+    execute 'Rg ' . expand('<cword>')
 endfunction
-
-nnoremap <C-g> :call AgCursorWord()<CR>
-
-" command! -nargs=+ Ag
-"       \ call fzf#vim#grep(
-"       \   'ag --vimgrep --no-heading --smart-case '.shellescape(<q-args>), 1,
-"       \   {'options': '--ansi'}, 0)
-
-" nnoremap <C-g> :call fzf#vim#grep('ag --vimgrep --no-heading --smart-case '.input('Ag: '), 1, {'options':'--ansi'}, 0)<CR>
-
-" nnoremap <C-g> :Rg<Space>
-" nnoremap <leader>rr :Rg<Space>
-
-" vim-commentary
-" gcc
-
-" nerdtree
-let NERDTreeShowHidden=1
-" map <C-n> :NERDTreeToggle<CR>
-
-" static width
-" let g:NERDTreeWinSize = 40
-
-" dynamic width
-function! s:NERDTreeWidthPct(pct)
-let g:NERDTreeWinSize = float2nr(&columns * a:pct) 
-endfunction
-autocmd VimEnter * call s:NERDTreeWidthPct(0.7) 
-
-" line numbers
-autocmd FileType nerdtree let b:nerdtree_has_number = &number | setlocal nonumber relativenumber
-autocmd BufLeave * if exists("b:nerdtree_has_number") | setlocal number | unlet b:nerdtree_has_number | endif
-
-" Prompt for folder and open NERDTree there
-function! PromptNERDTreeDir()
-    " Prompt user for folder path
-    let l:path = input('NERDTree folder: ', '', 'dir')
-    " Only continue if user typed something
-    if l:path != ''
-        " Change Vim cwd
-        execute 'cd' fnameescape(l:path)
-        " Open NERDTree rooted at that folder
-        execute 'NERDTree' fnameescape(l:path)
-    endif
-endfunction
-
-" Map <leader>e to call the prompt function
-" nnoremap <leader>e :call PromptNERDTreeDir()<CR>
-
-" <C-n>      Toggle NERDTree open/close
-" <leader>e  Focus NERDTree on current file (opens if closed)
-" <Enter>    Open file / enter folder
-" v          Open file in vertical split
-" s          Open file in horizontal split
-" t          Open file in new tab
-" k / j      Move cursor up / down
-" u          Go to parent directory
-" C          Change NERDTree root to folder under cursor (updates Vim cwd if enabled)
-" :NERDTreeChDir  Change Vim cwd to selected folder
-" I          Toggle hidden files
-" R          Refresh tree
-" /          Search for a file/node
-" p / P      Jump to sibling / previous node
-" <leader>c  Jump Vim cwd to current file’s folder (:cd %:p:h)
-" x          Collapse current folder
-
-" --------------------------------
+nnoremap <C-g> :call RgCursorWord()<CR>
 
 " MAPPINGS AND SETTINGS VIM"
 set relativenumber
@@ -654,10 +673,19 @@ nnoremap <C-O> <C-O>
 " add in C-9 in insert mode to go to back of sentence
 " and also C-0 to go back to front of sentence
 
+nnoremap <leader>ve :VimtexErrors<CR>
+" :VimtexErrors				- open vimtex errors
+" :copen					- open quickfix window
+" :cclose					- close quickfix window
+" :cnext					- next error
+" :cprev					- prev error
+" :cc
+
 " " LaTex General/Math
 inoremap ,6 ^{}<Left>
 inoremap ,- _{}<Left>
 
+inoremap ,hm \myhrule{1em}
 inoremap ,fr \frac{}{}<Left><Left><Left>
 inoremap ,su \sum_{}^{}<Left><Left><Left>
 inoremap ,in \int_{}^{}<Left><Left><Left><Left>
@@ -683,8 +711,9 @@ inoremap ,b9 \Big(  \Big)<Left><Left><Left>
 inoremap ,b[ \Big[  \Big]<Left><Left><Left>
 inoremap ,b{ \Big\{  \Big\}<Left><Left><Left>
 inoremap ,ss \subsection*{}<Left>
-inoremap ,pg \paragraph{}<Left>
+inoremap ,pg \paragraph{<Left>
 inoremap ,tt \text{}<Left>
+inoremap ,tl \texttt{}<Left>
 inoremap ,it \textit{}<Left>
 inoremap ,tm \item
 inoremap ,im \item
@@ -719,6 +748,9 @@ inoremap ,vb \verb\|\|<Left>
 inoremap ,vo \vocab{
 inoremap ,tf \therefore
 inoremap ,bo \boxednote{<CR><CR>}<Esc>kA
+inoremap ,ce \centering
+
+inoremap ,^Q <Esc>
 "<CR> is a carriage return in vim
 
 " ----- Lowercase -----
@@ -737,12 +769,12 @@ inoremap ,m  \mu
 inoremap ,n  \nu
 inoremap ,x  \xi
 inoremap ,p  \pi
-inoremap ,r  \rho
+inoremap ,rh  \rho
 inoremap ,sa  \sigma
 inoremap ,ta \tau
 inoremap ,un  \upsilon
 inoremap ,ph \phi
-inoremap ,c \chi
+inoremap ,ch \chi
 inoremap ,ps \psi
 inoremap ,oa  \omega
 
@@ -772,6 +804,7 @@ inoremap ,bs \boldsymbol{}<Left>
 inoremap ,bf \mathbf{}<Left>
 inoremap ,bb \mathbb{}<Left>
 inoremap ,ca \mathcal{}<Left>
+inoremap ,rm \mathrm{}<Left>
 
 inoremap ,4 $$<Left>
 " inoremap ,\ \[  \]<Left><Left><Left>
@@ -783,6 +816,13 @@ inoremap ,lo \log{}<Left>
 inoremap ,as \arcsin{}<Left>
 inoremap ,ac \arccos{}<Left>
 inoremap ,at \arctan{}<Left>
+
+inoremap ,deg ^\circ
+inoremap ,cu ^\circ\mathrm{C}
+inoremap ,fa ^\circ\mathrm{F}
+
+inoremap ,lw \leftarrow
+inoremap ,rw \rightarrow
 
 " LaTex math visual
 nnoremap ,im F$lvf$h
@@ -801,10 +841,15 @@ vnoremap ,gm F\vf{%
 nnoremap gm %
 vnoremap gm %
 
+" latex refs
+" \label{sec:intro}                         - create label
+" \ref{sec:intro}                           - reference label number
+" \hyperref[sec:intro]{words as label}      - clickable custom text
+"
 function! ShowWORD()
     let word = expand('<cWORD>')
 
-    " -------- BEGIN CASE --------
+    " -------- BEGIN itemize CASE --------
     if word =~ '^\\begin{itemize}'
         let depth = 0
         let lnum = line('.')
@@ -828,7 +873,7 @@ function! ShowWORD()
         echo "No matching \\end found"
         return
 
-    " -------- END CASE --------
+    " -------- END itemize CASE --------
     elseif word =~ '^\\end{itemize}'
         let depth = 0
         let lnum = line('.')
@@ -851,6 +896,55 @@ function! ShowWORD()
 
         echo "No matching \\begin found"
         return
+	
+	" -------- BEGIN verbatim CASE --------
+	elseif word =~ '^\\begin{verbatim}'
+		let depth = 0
+		let lnum = line('.')
+
+		while lnum < line('$')
+			let lnum += 1
+			let line = getline(lnum)
+
+			if line =~ '\\begin{verbatim}'
+				let depth += 1
+			elseif line =~ '\\end{verbatim}'
+				if depth == 0
+					let col = match(line, '\\')
+					call cursor(lnum, col + 1)
+					return
+				endif
+				let depth -= 1
+			endif
+		endwhile
+
+		echo "No matching \\end found"
+		return
+
+	" -------- END verbatim CASE --------
+    elseif word =~ '^\\end{verbatim}'
+        let depth = 0
+        let lnum = line('.')
+
+        while lnum > 1
+            let lnum -= 1
+            let line = getline(lnum)
+
+            if line =~ '\\end{verbatim}'
+                let depth += 1
+            elseif line =~ '\\begin{verbatim}'
+                if depth == 0
+                    let col = match(line, '\\')
+                    call cursor(lnum, col + 1)
+                    return
+                endif
+                let depth -= 1
+            endif
+        endwhile
+
+        echo "No matching \\begin found"
+        return
+
     endif
 endfunction
 
@@ -964,27 +1058,54 @@ nnoremap <C-q> <Esc>
 " better
 tnoremap <C-q> <Esc><C-\><C-n>
 
-nnoremap <leader>k :topleft split<CR>
+silent! nunmap <leader>h
+silent! nunmap <leader>j
+silent! nunmap <leader>k
+silent! nunmap <leader>l
+
+nnoremap <leader>h :topleft split<CR>
 nnoremap <leader>j :botright split<CR>
-nnoremap <leader>h :topleft vsplit<CR>
+nnoremap <leader>k :topleft vsplit<CR>
 nnoremap <leader>l :botright vsplit<CR>
 
+nnoremap gh :topleft vsplit<CR>
+
 " Resize splits with Alt + Shift + Arrows
-nnoremap <M-S-Up>    :resize +2<CR>
-nnoremap <M-S-Down>  :resize -2<CR>
-nnoremap <M-S-Right> :vertical resize -2<CR>
-nnoremap <M-S-Left>  :vertical resize +2<CR>
+nnoremap <M-S-Up>    :resize -2<CR>
+nnoremap <M-S-Down>  :resize +2<CR>
+nnoremap <M-S-Right> :vertical resize +2<CR>
+nnoremap <M-S-Left>  :vertical resize -2<CR>
 
 " Tabs "
 filetype on
 filetype plugin indent on
-" set expandtab
+set expandtab
 set shiftwidth=4
 set tabstop=4
 set softtabstop=4
-set smarttab
-set autoindent
-set smartindent
+
+" set shiftwidth=4
+" set tabstop=4
+" set softtabstop=4
+
+function! ToggleIndent()
+  if &shiftwidth == 2 
+    set shiftwidth=4 
+    set tabstop=4
+    set softtabstop=4
+  else
+    set shiftwidth=2
+    set tabstop=2
+    set softtabstop=2
+  endif
+  echo 'Indent width: ' . &shiftwidth
+endfunction
+
+nnoremap <leader>iw :call ToggleIndent()<CR>
+
+set nolist
+set listchars=tab:→\ ,trail:·,eol:↲,nbsp:␣
+nnoremap <leader>tt :set list!<CR>
 
 " Shift lines up s theand down in visual mode (selected lines)
 vnoremap <S-k> :move '<-2<CR>gv
@@ -1032,11 +1153,18 @@ syntax on
 nnoremap <leader>uv :e ~/.vimrc<CR>
 nnoremap <leader>uV :source ~/.vimrc<CR>
 
+nnoremap <leader>uz :e ~/.config/zathura/zathurarc<CR>
+
 nnoremap <leader>ut :e ~/.tmux.conf<CR>
 nnoremap <leader>uT :call setreg('+', 'tmux source-file ~/.tmux.conf')<CR>
 
 nnoremap <leader>uh :e ~/.config/hypr/<CR>
 nnoremap <leader>uk :e ~/.config/kitty/kitty.conf<CR>
+
+nnoremap <leader>ub :e ~/.bashrc<CR>
+nnoremap <leader>uB :source ~/.bashrc<CR>
+
+let g:netrw_winsize = 30
 
 nnoremap <C-n> :call ToggleEx()<CR>
 " nnoremap <C-n> :Lexplore<CR>
@@ -1044,10 +1172,20 @@ nnoremap <C-n> :call ToggleEx()<CR>
 function! ToggleEx()
   if &filetype ==# 'netrw'
     buffer #
+    return
   else
-    Ex
   endif
+
+  let l:file = expand('%t')
+
+  Ex
+
+  call search('\V' . escape(l:file, '\'))
+  normal! zz
+  nohlsearch
 endfunction
+
+nnoremap cc ?/$<CR>
 
 " turn to 0 to make it cwd
 let g:netrw_keepdir = 1
@@ -1093,9 +1231,6 @@ augroup netrw_maps
 	autocmd FileType netrw nmap <buffer> nd d
 augroup END
 
-let g:WebDevIconsUnicodeDecorateFolderNodesDefaultSymbol = ''
-let g:DevIconsDefaultFolderOpenSymbol = ''
-
 " look at previous commands
 nnoremap c; q:
 
@@ -1106,6 +1241,19 @@ inoremap <C-s> <Nop>
 set grepprg=rg\ --vimgrep\ --smart-case
 set grepformat=%f:%l:%c:%m
 command! -nargs=+ Grep silent execute 'grep! ' . <q-args> | copen | redraw!
+
+" --- tags ---
+set tags=./tags;,tags;
+" :echo tagfils()
+" gen ctags rel path
+nnoremap <leader>cT :!ctags -R .<CR>
+" gen ctags absolute path
+nnoremap <leader>ct :!ctags -R -f tags --sort=yes --tag-relative=no "$(pwd)"<CR>
+
+nnoremap <leader>ts :tselect<Space>
+" :tselect <tag_name>               - search menu for tags
+" C-]                               - goto first tag
+" :tag <tag>                        - to search for it
 
 " generate ctags based on pwd
 noremap <leader>ct :!ctags -R .<CR>
@@ -1242,7 +1390,7 @@ let g:ftplugin_sql_omni_key = '<C-j>'
 
 set timeout
 set ttimeoutlen=0
-set timeoutlen=800 " default is 1000 ms 
+set timeoutlen=500 " default is 1000 ms 
 " set notimeout " breaks esc 
 
 " multiline (multi line) comment
@@ -1314,10 +1462,6 @@ nnoremap <leader>q :confirm close<CR>
 " let g:indent_guides_guide_size = 1
 " let g:indent_guides_draw_blank = 0
 " let g:indent_guides_auto_colors = 0
-
-" nnoremap <leader>tl :colorscheme PaperColor<CR>
-nnoremap <leader>td :colorscheme gruvbox<CR>:set notermguicolors<CR>
-nnoremap <leader>tv :colorscheme vague<CR>:set termguicolors<CR>
 
 " nnoremap <leader>bd :set background=dark<CR>
 " nnoremap <leader>bl :set background=light<CR>
@@ -1585,5 +1729,125 @@ let g:hiPairs_hl_unmatchPair = {
 \ 'guibg'   : 'NONE'
 \ }
 
+highlight Comment cterm=NONE gui=NONE
+highlight Keyword cterm=NONE gui=NONE
+highlight Function cterm=NONE gui=NONE
+highlight Identifier cterm=NONE gui=NONE
+highlight SignColumn guibg=NONE ctermbg=NONE
 
-" vim can only detect my variables if i close and reopen vim
+set fileformat=unix
+set updatetime=250
+
+" du -b file.txt
+" du -k file.txt
+" du -m file.txt
+" du -BG file.txt
+" du BT file.txt
+" du -h file.txt
+"
+" if proj uses spaces
+" :set expandtab
+" :%retab
+"
+" if proj uses tabs
+" :set noexpandtab
+" :%retab
+"
+" eof and \n and ^M issues
+setlocal nofixeol
+setlocal noeol
+" :w
+
+" check with:
+" :set fixeol?
+" :set eol?
+
+set fileformats=unix,dos
+
+" linux
+" truncate -s -1 <file_name>
+" to get rid of last byte
+"
+" git issues with ^M
+" on wsl:
+" git config --global core.autocrlf t rue
+"
+" on windows:
+" git config --get core.autocrlf
+"
+" LF (\n) = unix/linux/macos
+" CRLF (\r\n) = windows
+"
+" to have a newline at eof:
+" :set eof
+" :set fixeol
+" :w
+"
+
+nnoremap L :tabn<CR>
+nnoremap H :tabp<CR>
+
+" netrw
+" t -> open the file in a new tab
+" v -> open in a vertical split
+" o -> open in a horizontal split
+" enter -> open normally
+
+" rg "word"             - search recursively
+" rg -i "word"          - case-insensitive
+" rg -n "word"          - show line numbers
+" rg -in "word"         - case-insensitive + show line numbers
+" rg -w "word"          - whole word only
+" rg -l "word"          - filenames containing matches
+" rg -c "word"          - count matches per file
+" rg -v "word"          - lines NOT containing word
+" rg -A 3 "word"        - 3 lines after match
+" rg -B 3 "word"        - 3 lines before match
+" rg -C 3 "word"        - 3 lines of context
+" rg -o "word"          - print only matching text
+" rg -F "word"          - literal string, no regex
+" rg -S "word"          - smart case
+" rg --hidden "word"    - include hidden files
+" rg --no-ignore "word" - ingore .gitignore rules
+" rg -n "test" -g "*.cpp" - only *.cpp files
+"
+" grep -r "word" .      - recursive search
+" grep -ri "word" .     - case-insensitive
+" grep -rn "word" .     - line numbers
+" grep -rin "word" .    - case-insensitive + show line numbers
+" grep -rw "word" .     - whole word only
+" grep -rl "word" .     - filenames containg matches
+" grep -rL "word" .     - filenames without matches
+" grep -rc "word" .     - count matches per file
+" grep -rv "word" .     - invert match (lines NOT containing word)
+" grep -rA 3 "word" .   - 3 lines after match
+" grep -rB 3 "word" .   - 3 lines before match
+" grep -rC 3 "word" .   - 3 lines of context around match
+" grep -rn --include="*.cpp" "test" . - only *.cpp files
+"
+" grep -r --include="*.cpp" "word" .
+" grep -r --include="*.h" "word" .
+" grep -r --exclude="*.log" "word" .
+
+" ?word\c               - the \c tells to ignore case
+
+nnoremap <leader>cs :execute 'find ' . expand('%t:r') . '.cpp'<CR>
+nnoremap <leader>ch :execute 'find ' . expand('%t:r') . '.h'<CR>
+
+" fix windows errors on wsl for a file:
+" find <file_path> -type f -exec sed -i 's/\r$//' {} +
+" -- or --
+" find ~/.vim/plugged/conflict-marker.vim -type f -exec dos2unix {} \;
+
+" --- fzf ---
+" find . -type f | fzf          - search files with fzf
+" git ls-files | fzf            - search git-tracked files
+" history | fzf                 - search command history
+" ps aux | fzf                  - search processes
+" git branch | fzf              - search branches
+" --- ---
+"
+" --- windows ---
+" mmsys.cpl for windows
+" alt + enter                   - collapse windows terminal tabs
+" --- ---

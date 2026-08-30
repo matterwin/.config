@@ -1,4 +1,5 @@
 % ---- Macros ----
+\newcommand{\tidle}{\textasciitilde}
 \newcommand{\myhrule}[1]{%
   \vspace{#1}%
   \noindent\hrule
@@ -162,6 +163,12 @@
     \includegraphics[width=#2\textwidth]{#1}\hfill
     \includegraphics[width=#4\textwidth]{#3}
   \end{center}
+}
+\newcommand{\cic}[3]{%
+    \begin{center}
+    \includegraphics[width=#2\textwidth]{#1}\\
+    \small #3
+    \end{center}
 }
 \newcommand{\newbp}{%
   \newpage
