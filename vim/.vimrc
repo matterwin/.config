@@ -128,6 +128,7 @@ Plug 'sheerun/vim-polyglot'
 " Academic
 Plug 'lervag/vimtex'
 Plug 'preservim/vim-markdown'
+Plug 'ThunderBoltCODMYT/gruber-darker.vim'
 
 " Lsp plugins
 Plug 'prabirshrestha/vim-lsp'
@@ -140,12 +141,14 @@ call plug#end()
 
 " --- colorscheme ---
 set termguicolors
+set background=dark
 " set notermguicolors
 "
 " https://github.com/vague-theme/vague.nvim
 " colorscheme vague
 " colorscheme gruvbox
 colorscheme gruvbox-material
+" colorscheme gruber-darker
 
 " --- Unbind Nop section ---
 
@@ -470,11 +473,12 @@ endfunction
 let s:p = {'normal': {}, 'inactive': {}, 'insert': {}, 'replace': {}, 'visual': {}, 'tabline': {}}
 
 " --- Statusline ---
-let s:p.normal.left   = [ ['#d1d1d1', '#5f4664', 15, 238] ]
-let s:p.normal.middle = [ ['#d1d1d1', '#5f4664', 15, 238] ]
-let s:p.normal.right  = [ ['#d1d1d1', '#5f4664', 15, 238] ]
+let s:p.normal.left   = [ ['#d1d1d1', '#584961', 15, 238] ]
+let s:p.normal.middle = [ ['#d1d1d1', '#584961', 15, 238] ]
+let s:p.normal.right  = [ ['#d1d1d1', '#584961', 15, 238] ]
 
 " #584961
+" #3C3836
 
 " a way to change other colors for other modes
 " let s:p.visual.left   = [ ['black', 'white', 142, 238], ['black', 'white', 15, 238] ]
@@ -734,8 +738,8 @@ inoremap ,cb \begin{tcolorbox}<CR><CR>\end{tcolorbox}<Esc>kA
 inoremap ,eq \begin{equation*}<CR><CR>\end{equation*}<Esc>kA
 inoremap ,bm \begin{multicols}{1}<CR><CR>\end{multicols}<Esc>kA
 inoremap ,ar \begin{array}<CR><CR>\end{array}<Esc>kA
-inoremap ,al \begin{align*}<CR><CR>\end{align*}<C-o>k
-inoremap ,tb \textbf{}<Left>
+inoremap ,an \begin{align*}<CR><CR>\end{align*}<C-o>k
+" inoremap ,tb \textbf{}<Left>
 inoremap ,fb \fbox{}<Left>
 inoremap <C-a> \textbf{
 inoremap <C-z> {
@@ -754,7 +758,7 @@ inoremap ,^Q <Esc>
 "<CR> is a carriage return in vim
 
 " ----- Lowercase -----
-inoremap ,aa  \alpha
+inoremap ,al  \alpha
 inoremap ,bt  \beta
 inoremap ,ga  \gamma
 inoremap ,da  \delta
@@ -1104,7 +1108,8 @@ endfunction
 nnoremap <leader>iw :call ToggleIndent()<CR>
 
 set nolist
-set listchars=tab:→\ ,trail:·,eol:↲,nbsp:␣
+" set listchars=tab:→\ ,trail:·,eol:↲,nbsp:␣
+set listchars=space:·,tab:»·,trail:·
 nnoremap <leader>tt :set list!<CR>
 
 " Shift lines up s theand down in visual mode (selected lines)
@@ -1196,7 +1201,7 @@ let g:netrw_banner = 0
 " 1 = Long  - filename + file size + date
 " 2 = Wide  - multiple files per line, column layout
 " 3 = Tree  - NERDTree-style expandable tree
-let g:netrw_liststyle = 3
+let g:netrw_liststyle = 1
 
 " netrw_browse_split options (where files open on Enter):
 " 0 = same window (replaces netrw)
@@ -1261,14 +1266,6 @@ nnoremap <leader>x :copen<CR>
 nnoremap <leader>ff :find 
 nnoremap <leader>fg :Grep 
 nnoremap <leader>cd :cd 
-
-" ------- COLORSCHEME
-
-" built into vim
-" colorscheme retrobox
-
-" Dark mode -- Gruvbox
-set background=dark
 
 syntax enable
 
@@ -1734,6 +1731,7 @@ highlight Keyword cterm=NONE gui=NONE
 highlight Function cterm=NONE gui=NONE
 highlight Identifier cterm=NONE gui=NONE
 highlight SignColumn guibg=NONE ctermbg=NONE
+highlight CursorLineNr guifg=#87AFAF gui=bold
 
 set fileformat=unix
 set updatetime=250
@@ -1851,3 +1849,21 @@ nnoremap <leader>ch :execute 'find ' . expand('%t:r') . '.h'<CR>
 " mmsys.cpl for windows
 " alt + enter                   - collapse windows terminal tabs
 " --- ---
+"
+"  maybe have c-bm to bold word automatically (entails just doing B or viW
+"  then B and E and then the \textbf{ then }
+"  - maybe have a way that you can place a value into copy registers to use
+"  them on the fly like how the mark mechanism works but for clipboard
+
+
+" highlight Comment guibg=#404040
+
+" --- from pc ---
+
+nnoremap ,bf ciw\textbf{<C-r>"}<Esc>
+nnoremap ,bi ciw\textit{<C-r>"}<Esc>
+nnoremap ,bu ciw\underline{<C-r>"}<Esc>
+nnoremap ,bt ciw\texttt{<C-r>"}<Esc>
+
+inoremap ,tb \begin{tabular}{c}<CR><CR>\end{tabular}<Esc>kA
+nnoremap ,aa ggVGy<C-o><C-o>
