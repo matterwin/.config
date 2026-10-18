@@ -136,6 +136,8 @@ Plug 'mattn/vim-lsp-settings'
 Plug 'prabirshrestha/asyncomplete.vim'
 Plug 'prabirshrestha/asyncomplete-lsp.vim'
 Plug 'dense-analysis/ale'
+Plug 'ludovicchabant/vim-gutentags'
+Plug 'skywind3000/gutentags_plus'
 call plug#end()
 " ---------------------------------
 
@@ -162,7 +164,7 @@ colorscheme gruvbox-material
 map <C-w> <Nop>
 map Q <Nop>
 inoremap <C-_> <Nop>
-map <C-b> <Nop>
+" map <C-b> <Nop>
 
 " -------------------------
 
@@ -473,12 +475,13 @@ endfunction
 let s:p = {'normal': {}, 'inactive': {}, 'insert': {}, 'replace': {}, 'visual': {}, 'tabline': {}}
 
 " --- Statusline ---
-let s:p.normal.left   = [ ['#d1d1d1', '#584961', 15, 238] ]
-let s:p.normal.middle = [ ['#d1d1d1', '#584961', 15, 238] ]
-let s:p.normal.right  = [ ['#d1d1d1', '#584961', 15, 238] ]
+let s:p.normal.left   = [ ['#d1d1d1', '#303030', 15, 238] ]
+let s:p.normal.middle = [ ['#d1d1d1', '#303030', 15, 238] ]
+let s:p.normal.right  = [ ['#d1d1d1', '#303030', 15, 238] ]
 
 " #584961
 " #3C3836
+" #303030
 
 " a way to change other colors for other modes
 " let s:p.visual.left   = [ ['black', 'white', 142, 238], ['black', 'white', 15, 238] ]
@@ -551,8 +554,13 @@ let $FZF_DEFAULT_COMMAND = 'rg --files --hidden --glob "!.git"'
 
 nnoremap <C-p> :Files<CR>
 " nnoremap <C-f> :Lines<CR>
-nnoremap <C-b> :Buffers<CR>
+" nnoremap <C-b> :Buffers<CR>
+" Search symbols across the project
 nnoremap <C-t> :Tags<CR>
+nnoremap <C-b> :BTags<CR>
+
+" Search text across the project
+nnoremap <leader>fg :Rg<Space>
 
 let g:fzf_layout = { 'down': '100%' }
 let g:fzf_vim = {}
@@ -740,7 +748,7 @@ inoremap ,bm \begin{multicols}{1}<CR><CR>\end{multicols}<Esc>kA
 inoremap ,ar \begin{array}<CR><CR>\end{array}<Esc>kA
 inoremap ,an \begin{align*}<CR><CR>\end{align*}<C-o>k
 " inoremap ,tb \textbf{}<Left>
-inoremap ,fb \fbox{}<Left>
+inoremap ,fx \fbox{}<Left>
 inoremap <C-a> \textbf{
 inoremap <C-z> {
 inoremap <C-x> }
@@ -1072,8 +1080,6 @@ nnoremap <leader>j :botright split<CR>
 nnoremap <leader>k :topleft vsplit<CR>
 nnoremap <leader>l :botright vsplit<CR>
 
-nnoremap gh :topleft vsplit<CR>
-
 " Resize splits with Alt + Shift + Arrows
 nnoremap <M-S-Up>    :resize -2<CR>
 nnoremap <M-S-Down>  :resize +2<CR>
@@ -1261,11 +1267,11 @@ nnoremap <leader>ts :tselect<Space>
 " :tag <tag>                        - to search for it
 
 " generate ctags based on pwd
-noremap <leader>ct :!ctags -R .<CR>
+" noremap <leader>ct :!ctags -R .<CR>
 nnoremap <leader>x :copen<CR>
 nnoremap <leader>ff :find 
 nnoremap <leader>fg :Grep 
-nnoremap <leader>cd :cd 
+" nnoremap <leader>cd :cd 
 
 syntax enable
 
@@ -1867,3 +1873,82 @@ nnoremap ,bt ciw\texttt{<C-r>"}<Esc>
 
 inoremap ,tb \begin{tabular}{c}<CR><CR>\end{tabular}<Esc>kA
 nnoremap ,aa ggVGy<C-o><C-o>
+
+nnoremap ,fb /{<CR>
+nnoremap ,fe /}<CR>
+nnoremap ,f9 /(<CR>
+nnoremap ,f0 /)<CR>
+inoremap <C-s> <Esc>:w<CR>
+vnoremap <C-s> <Esc>:w<CR>
+
+set hlsearch
+set incsearch
+
+highlight Search     guifg=#1e1e2e guibg=#404040
+highlight IncSearch  guifg=#1e1e2e guibg=#a6e3a1
+
+" #a6e3a1
+
+set wildmenu
+set wildoptions=pum
+set wildmode=longest:full,full
+
+" enable gtags module
+let g:gutentags_modules = ['ctags', 'gtags_cscope']
+
+" config project root markers.
+let g:gutentags_project_root = ['.root', '.git']
+
+" generate datebases in my cache directory, prevent gtags files polluting my project
+let g:gutentags_cache_dir = expand('~/.cache/tags')
+
+" change focus to quickfix window after search (optional).
+let g:gutentags_plus_switch = 1
+
+" <leader>cs 	Find symbol (reference) under cursor
+" <leader>cg 	Find symbol definition under cursor
+" <leader>cd 	Functions called by this function
+" <leader>cc 	Functions calling this function
+" <leader>ct 	Find text string under cursor
+" <leader>ce 	Find egrep pattern under cursor
+" <leader>cf 	Find file name under cursor
+" <leader>ci 	Find files #including the file name under cursor
+" <leader>ca 	Find places where current symbol is assigned
+" <leader>cz 	Find current word in ctags database
+"
+" noremap <silent> <leader>gs :GscopeFind s <C-R><C-W><cr>
+" noremap <silent> <leader>gg :GscopeFind g <C-R><C-W><cr>
+" noremap <silent> <leader>gc :GscopeFind c <C-R><C-W><cr>
+" noremap <silent> <leader>gt :GscopeFind t <C-R><C-W><cr>
+" noremap <silent> <leader>ge :GscopeFind e <C-R><C-W><cr>
+" noremap <silent> <leader>gf :GscopeFind f <C-R>=expand("<cfile>")<cr><cr>
+" noremap <silent> <leader>gi :GscopeFind i <C-R>=expand("<cfile>")<cr><cr>
+" noremap <silent> <leader>gd :GscopeFind d <C-R><C-W><cr>
+" noremap <silent> <leader>ga :GscopeFind a <C-R><C-W><cr>
+" noremap <silent> <leader>gz :GscopeFind z <C-R><C-W><cr>
+
+" Where is this symbol used? <leader>cs
+" Where is this symbol defined? <leader>cg
+" Which functions call this function? <leader>cc
+" Which functions does this function call? <leader>cd
+" Where is this variable assigned? <leader>ca
+
+set cscopeprg=gtags-cscope
+set cscopetag
+" run cmd from your project root, where gtags exists
+" :cs add GTAGS
+
+function! GTagsSink(line)
+    let parts = split(a:line, '\s\+')
+    if len(parts) < 3
+        return
+    endif
+    execute 'edit +' . parts[1] . ' ' . fnameescape(parts[0])
+endfunction
+
+command! GTags call fzf#run(fzf#wrap({
+    \ 'source': 'global -x .',
+    \ 'sink': function('GTagsSink'),
+    \ 'options': ['--prompt', 'GTags> ']
+    \ }))
+" --- ---
