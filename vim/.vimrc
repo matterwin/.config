@@ -1835,8 +1835,8 @@ nnoremap H :tabp<CR>
 
 " ?word\c               - the \c tells to ignore case
 
-nnoremap <leader>cs :execute 'find ' . expand('%t:r') . '.cpp'<CR>
-nnoremap <leader>ch :execute 'find ' . expand('%t:r') . '.h'<CR>
+nnoremap <leader>cs :execute 'find ' . expand('%:t:r:r') . '.cpp'<CR>
+nnoremap <leader>ch :execute 'find ' . expand('%:t:r:r') . '.h'<CR>
 
 " fix windows errors on wsl for a file:
 " find <file_path> -type f -exec sed -i 's/\r$//' {} +
