@@ -415,11 +415,12 @@ let g:lightline = {
 	\ 'colorscheme': 'mytheme',
 	\ 'active': {
 	\   'left': [['filename', 'gitbranch', 'readonly']],
-	\   'right': [ ['lineinfo'], ['percent'], ['filetype'], ['searchindex'], ['visualcount'] ]
+	\   'right': [ ['lineinfo'], ['percent'], ['fileformat'], ['filetype'], ['searchindex'], ['visualcount'] ]
 	\ },
 	\ 'component_function': {
 	\   'gitbranch': 'gitbranch#name',
 	\   'filename': 'LightlineFilename',
+    \   'fileformat': 'LightlineFileFormat',
 	\   'searchindex': 'LightlineSearchIndex',
 	\   'visualcount': 'LightlineVisualCount'
 	\ },
@@ -442,6 +443,15 @@ function! UpdateVisualCount()
   else
     let g:visual_char_count = ''
   endif
+endfunction
+
+function! LightlineFileFormat()
+    if &fileformat ==# 'unix'
+        return 'LF'
+    elseif &fileformat ==# 'dos'
+        return 'CRLF'
+    else
+        return &fileformat
 endfunction
 
 function! LightlineSearchIndex() abort
@@ -544,7 +554,21 @@ xnoremap U <Nop>
 
 " fzf
 " Keybinding for fuzzy file search
-let $FZF_DEFAULT_COMMAND = 'rg --files --hidden --glob "!.git"'
+
+let g:fzf_exclude_globs = ['.git']
+
+function! s:UpdateFzfCommand() abort
+    let l:globs = ''
+
+    for glob in g:fzf_exclude_globs
+        let l:globs .= ' --glob "!' . glob . '"'
+    endfor
+
+    let $FZF_DEFAULT_COMMAND = 'rg --files --hidden' . l:globs
+    " let $FZF_DEFAULT_COMMAND .= ' --preview "batcat --style=numbers --color=always --line-range=:500 {}"'
+endfunction
+
+call s:UpdateFzfCommand()
 
 " tab			- mark files for multi-select
 " enter			- open selected files as buffers
@@ -557,12 +581,13 @@ nnoremap <C-p> :Files<CR>
 " nnoremap <C-b> :Buffers<CR>
 " Search symbols across the project
 nnoremap <C-t> :Tags<CR>
+" Search symbols in current buffer (file)
 nnoremap <C-b> :BTags<CR>
 
 " Search text across the project
 nnoremap <leader>fg :Rg<Space>
 
-let g:fzf_layout = { 'down': '100%' }
+let g:fzf_layout = { 'window': { 'width': 1.0, 'height': 1.0, 'border': 'none' } }
 let g:fzf_vim = {}
 let g:fzf_vim.preview_window = ['up:50%']
 
@@ -1166,6 +1191,8 @@ nnoremap <leader>uV :source ~/.vimrc<CR>
 
 nnoremap <leader>uz :e ~/.config/zathura/zathurarc<CR>
 
+nnoremap <leader>ug :e ~/.git_tips<CR>
+
 nnoremap <leader>ut :e ~/.tmux.conf<CR>
 nnoremap <leader>uT :call setreg('+', 'tmux source-file ~/.tmux.conf')<CR>
 
@@ -1739,7 +1766,6 @@ highlight Identifier cterm=NONE gui=NONE
 highlight SignColumn guibg=NONE ctermbg=NONE
 highlight CursorLineNr guifg=#87AFAF gui=bold
 
-set fileformat=unix
 set updatetime=250
 
 " du -b file.txt
@@ -1766,7 +1792,7 @@ setlocal noeol
 " :set fixeol?
 " :set eol?
 
-set fileformats=unix,dos
+" set fileformats=unix,dos
 
 " linux
 " truncate -s -1 <file_name>
@@ -1835,8 +1861,8 @@ nnoremap H :tabp<CR>
 
 " ?word\c               - the \c tells to ignore case
 
-nnoremap <leader>cs :execute 'find ' . expand('%:t:r:r') . '.cpp'<CR>
-nnoremap <leader>ch :execute 'find ' . expand('%:t:r:r') . '.h'<CR>
+nnoremap <leader>gs :execute 'find ' . expand('%:t:r:r') . '.cpp'<CR>
+nnoremap <leader>gh :execute 'find ' . expand('%:t:r:r') . '.h'<CR>
 
 " fix windows errors on wsl for a file:
 " find <file_path> -type f -exec sed -i 's/\r$//' {} +
@@ -1863,8 +1889,6 @@ nnoremap <leader>ch :execute 'find ' . expand('%:t:r:r') . '.h'<CR>
 
 
 " highlight Comment guibg=#404040
-
-" --- from pc ---
 
 nnoremap ,bf ciw\textbf{<C-r>"}<Esc>
 nnoremap ,bi ciw\textit{<C-r>"}<Esc>
@@ -1894,16 +1918,16 @@ set wildoptions=pum
 set wildmode=longest:full,full
 
 " enable gtags module
-let g:gutentags_modules = ['ctags', 'gtags_cscope']
+" let g:gutentags_modules = ['ctags', 'gtags_cscope']
 
 " config project root markers.
-let g:gutentags_project_root = ['.root', '.git']
+" let g:gutentags_project_root = ['.root', '.git']
 
 " generate datebases in my cache directory, prevent gtags files polluting my project
-let g:gutentags_cache_dir = expand('~/.cache/tags')
+" let g:gutentags_cache_dir = expand('~/.cache/tags')
 
 " change focus to quickfix window after search (optional).
-let g:gutentags_plus_switch = 1
+" let g:gutentags_plus_switch = 1
 
 " <leader>cs 	Find symbol (reference) under cursor
 " <leader>cg 	Find symbol definition under cursor
@@ -1935,20 +1959,82 @@ let g:gutentags_plus_switch = 1
 
 set cscopeprg=gtags-cscope
 set cscopetag
-" run cmd from your project root, where gtags exists
-" :cs add GTAGS
+set cscopequickfix=s-,c-,d-,i-,t-,e-,f-,a-
 
-function! GTagsSink(line)
-    let parts = split(a:line, '\s\+')
-    if len(parts) < 3
-        return
+" appends new results from prev results
+" set cscopequickfix=s+,c+,d+,i+,t+,e+,f+,a+
+
+" run cmd from your project root, where gtags exists
+" Cscope searches
+
+nnoremap <leader>cs :cs find s <C-R>=expand('<cword>')<CR><CR>:copen<CR>
+nnoremap <leader>cg :cs find g <C-R>=expand('<cword>')<CR><CR>:copen<CR>
+nnoremap <leader>cc :cs find c <C-R>=expand('<cword>')<CR><CR>:copen<CR>
+nnoremap <leader>cd :cs find d <C-R>=expand('<cword>')<CR><CR>:copen<CR>
+nnoremap <leader>ct :cs find t <C-R>=expand('<cword>')<CR><CR>:copen<CR>
+nnoremap <leader>ce :cs find e <C-R>=expand('<cword>')<CR><CR>:copen<CR>
+nnoremap <leader>cf :cs find f <C-R>=expand('<cfile>')<CR><CR>:copen<CR>
+nnoremap <leader>ci :cs find i ^<C-R>=expand('<cfile>')<CR>$<CR>:copen<CR>
+nnoremap <leader>ca :cs find a <C-R>=expand('<cword>')<CR><CR>:copen<CR>
+
+" Cscope mappings:
+" s = Find symbol
+" g = Find global definition
+" c = Find functions calling this function
+" d = Find functions called by this function
+" t = Find text string
+" e = Find egrep pattern
+" f = Find file
+" i = Find files including this file
+" a = Find assignments to this symbol
+
+nnoremap ]q :cnext<CR>
+nnoremap [q :cprev<CR>
+
+function! ToggleRelativeNumber()
+    if &relativenumber
+        set norelativenumber
+    else
+        set relativenumber
     endif
-    execute 'edit +' . parts[1] . ' ' . fnameescape(parts[0])
 endfunction
 
-command! GTags call fzf#run(fzf#wrap({
-    \ 'source': 'global -x .',
-    \ 'sink': function('GTagsSink'),
-    \ 'options': ['--prompt', 'GTags> ']
-    \ }))
-" --- ---
+nnoremap <leader>tr :call ToggleRelativeNumber()<CR>
+
+nnoremap <leader>tb :TagbarToggle<CR>
+let g:tagbar_left = 1
+let g:tagbar_width = 35
+
+nnoremap ,del \delta
+
+" vim -b <file>             - to open file in binary mode
+"
+" ::%!xxd                   - show all bytes of lines of code
+" example:
+" 6e 61 0a                  - 0a = \n (unix)
+" 6e 61 0d 0a               - 0d = \r, 0a = \n (dos)
+"
+" xxd file | tail           - see last line of bytes
+" cat -A file
+"
+" truncate -s -2 file       - truncates the last 2 bytes (ex: \r\n)
+" printf '\r\n' >> file     - adds \r\n to eof
+"
+" ./test.exe --gtest_filter=TestSuiteName.TestName
+
+" open cmd line history
+nnoremap c; q:
+" open search history for / searches
+nnoremap c/ q/
+" open search history for ? searches
+nnoremap c? q?
+
+" rg -l "test" -g "*.cpp"       - only *.cpp files and just show filepath
+" rg --files -g '!Build/**'     - lists file cluding Build dir and its
+" children
+
+highlight SignColumn guifg=#87AFAF gui=bold
+
+set fileformats=unix,dos
+" Windows C: drive -> use CRLF
+autocmd BufNewFile,BufRead /mnt/c/* setlocal fileformat=dos
